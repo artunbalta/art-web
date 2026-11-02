@@ -41,7 +41,7 @@ const Game = (() => {
     const dpr = Math.min(window.devicePixelRatio || 1, 3);
     const cw = innerWidth, ch = innerHeight;
     const short = Math.min(cw, ch) * dpr;
-    const want = Math.min(cw, ch) < 600 ? 12 * TILE : 17 * TILE;
+    const want = Math.min(cw, ch) < 600 ? 15 * TILE : 17 * TILE; // phones see a bit more of the world, so walking doesn't feel like sprinting
     G.scale = Math.max(1, Math.round(short / want));
     G.vw = Math.ceil(cw * dpr / G.scale); G.vh = Math.ceil(ch * dpr / G.scale);
     cv.width = G.vw + 1; cv.height = G.vh + 1;
@@ -414,7 +414,7 @@ const Game = (() => {
         const K = G.keys;
         if (K.ArrowLeft || K.a) sx -= 1; if (K.ArrowRight || K.d) sx += 1;
         if (K.ArrowUp || K.w) sy -= 1; if (K.ArrowDown || K.s) sy += 1;
-        if (Pad.st.on) { sx = Pad.st.sx; sy = Pad.st.sy; p.padRun = Pad.st.run || Pad.st.mag > 0.97; }
+        if (Pad.st.on) { sx = Pad.st.sx; sy = Pad.st.sy; } // running only with the RUN button, never by pushing harder
         if (sx || sy) {
           p.path = null; p.onArrive = null;
           p.dir = sx < 0 ? 'l' : sx > 0 ? 'r' : sy < 0 ? 'u' : 'd';
