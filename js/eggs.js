@@ -734,24 +734,39 @@ const Eggs = (() => {
     }
   }
   class Dog {
-    constructor(x, y) { this.s = makeDog(); this.x = x; this.y = y; this.dir = 'r'; this.state = 'sit'; this.trail = []; this.blocks = false; this.shadowR = 6; }
+    // follows the exact path you walked, a fixed distance behind — no catching up, no stop-start flicker
+    constructor(x, y) { this.s = makeDog(); this.x = x; this.y = y; this.dir = 'r'; this.state = 'sit'; this.blocks = false; this.shadowR = 6; this.path = [[x, y]]; this.walked = 0; this.stillT = 9; }
     update(dt) {
       if (this.state !== 'follow') return;
       const p = P();
       if (p.hidden) return;
-      this.trail.push([p.x, p.y]); if (this.trail.length > 16) this.trail.shift();
-      const [tx, ty] = this.trail[0];
-      const d = Math.hypot(tx - this.x, ty - this.y);
-      if (d > 15) { const sp = Math.min(d, (p.curSpeed() + 14) * dt); this.x += (tx - this.x) / d * sp; this.y += (ty - this.y) / d * sp; this.moving = true; if (Math.abs(tx - this.x) > 1) this.dir = tx < this.x ? 'l' : 'r'; }
-      else this.moving = false;
-      if (d > 170) { this.x = p.x + 12; this.y = p.y; }
-      if (this.moving && Math.random() < dt * 0.03) Game.bubble(this, pick(['HAV!', 'HAV HAV!']), 1100);
+      const last = this.path[this.path.length - 1];
+      if (Math.hypot(p.x - last[0], p.y - last[1]) > 64) this.path = [[this.x, this.y]]; // you teleported (map, train, boat)
+      const tail = this.path[this.path.length - 1];
+      if (Math.hypot(p.x - tail[0], p.y - tail[1]) >= 1) this.path.push([p.x, p.y]);
+      // the point LAG px back along your trail
+      const LAG = 24;
+      let need = LAG, ax = p.x, ay = p.y, tx = this.x, ty = this.y, found = false;
+      for (let i = this.path.length - 1; i >= 0; i--) {
+        const [qx, qy] = this.path[i], seg = Math.hypot(ax - qx, ay - qy);
+        if (seg >= need) { const k = need / seg; tx = ax + (qx - ax) * k; ty = ay + (qy - ay) * k; found = true; if (i > 1) this.path.splice(0, i - 1); break; }
+        need -= seg; ax = qx; ay = qy;
+      }
+      if (!found) { tx = this.x; ty = this.y; } // trail shorter than LAG: you're right next to him, he waits
+      const dx = tx - this.x, dy = ty - this.y, step = Math.hypot(dx, dy);
+      if (step > 0.05) {
+        this.x = tx; this.y = ty; this.walked += step; this.stillT = 0;
+        if (Math.abs(dx) > step * 0.35) this.dir = dx < 0 ? 'l' : 'r';
+      } else this.stillT += dt;
+      if (this.stillT === 0 && Math.random() < dt * 0.02) Game.bubble(this, pick(['HAV!', 'HAV HAV!']), 1100);
     }
     draw(g, cx, cy) {
       if (this.hidden) return;
       const x = Math.round(this.x - cx), y = Math.round(this.y - cy);
-      if (this.moving) g.drawImage(this.s[this.dir][1 + (Math.floor(Game.t * 9) % 2)], x - 11, y - 15);
-      else g.drawImage(this.s.sit[Math.floor(Game.t * 3) % 2], x - 9, y - 17);
+      if (this.stillT > 0.7) { g.drawImage(this.s.sit[Math.floor(Game.t * 2.2) % 2], x - 9, y - 17); return; }
+      // trot: step, neutral, other step, neutral — paced by distance, not by the clock
+      const f = this.stillT < 0.12 ? [1, 0, 2, 0][Math.floor(this.walked / 6) % 4] : 0;
+      g.drawImage(this.s[this.dir][f], x - 11, y - 15);
     }
   }
   class Flyers {
