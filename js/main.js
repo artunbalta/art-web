@@ -56,6 +56,18 @@
   });
 
   drawLogo();
+  // blow the logo up by a whole number of device pixels, so every pixel is the same size (no shimmer)
+  function fitLogo() {
+    const L = $('#logo'), dpr = window.devicePixelRatio || 1;
+    const k = Math.max(1, Math.floor(Math.min(innerWidth * 0.8, 540) * dpr / L.width));
+    L.style.width = (L.width * k / dpr) + 'px';
+    L.style.setProperty('--lp', (k / dpr) + 'px');
+  }
+  fitLogo(); addEventListener('resize', fitLogo);
+  // show the title text only once its fonts are in, so nothing jumps when they arrive
+  const ready = () => document.body.classList.add('ready');
+  addEventListener('load', () => (document.fonts ? document.fonts.ready : Promise.resolve()).then(ready));
+  setTimeout(ready, 2000);
   UI.init();
   Game.init();
 

@@ -39,8 +39,10 @@ a { color: var(--blue); }
   transition: opacity .6s, visibility .6s;
 }
 body.playing #title { opacity: 0; visibility: hidden; pointer-events: none; }
-#logo { width: min(80vw, 520px); height: auto; image-rendering: pixelated; filter: drop-shadow(0 6px 0 rgba(27,20,40,.35)); animation: bob 3.2s ease-in-out infinite; }
-@keyframes bob { 50% { transform: translateY(-6px); } }
+#logo { height: auto; image-rendering: pixelated; filter: drop-shadow(0 6px 0 rgba(27,20,40,.35)); animation: bob 1.6s steps(1, end) infinite; }
+/* the logo hops by exactly two of its own pixels — never a fraction of one */
+@keyframes bob { 50% { transform: translateY(calc(var(--lp, 3px) * -2)); } }
+body:not(.ready) #title > :not(.logo-wrap) { visibility: hidden; }
 #title .sub { margin: 4px 0 0; font-family: var(--label); font-size: clamp(11px, 2.2vw, 15px); color: var(--white); text-shadow: 2px 2px 0 var(--ink); letter-spacing: .03em; }
 #title .press { margin: 10px 0 2px; font-size: 18px; color: var(--y); text-shadow: 2px 2px 0 var(--ink); animation: blink 1.1s steps(2) infinite; }
 #title .press .t { display: none; }

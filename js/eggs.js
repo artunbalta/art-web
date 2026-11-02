@@ -698,7 +698,7 @@ const Eggs = (() => {
       TR.front += TR.dir * TR.v * dt;
       if ((TR.target - TR.front) * TR.dir <= 0) { TR.front = TR.target; TR.state = 'idle'; TR.v = 0; SFX.whistle(); TR.onArrive && TR.onArrive(); }
       if (Math.random() < dt * 2.2) { Game.particle({ x: TR.front - TR.dir * 12, y: TR.y - 32, vx: -TR.dir * 10, vy: -16, life: 1.6, kind: 'smoke', col: C.t5 }); SFX.chug(); }
-      Game.G.camFocus = { x: TR.front - TR.dir * 60, y: TR.y - 20 };
+      Game.G.camFocus = { x: Math.round(TR.front) - TR.dir * 60, y: TR.y - 20 };
     } else if (Math.random() < dt * 0.6) Game.particle({ x: TR.front - TR.dir * 12, y: TR.y - 32, vx: -TR.dir * 4, vy: -10, life: 1.4, kind: 'smoke', col: C.t5 });
   }
   function trainDraw(g, cx, cy) {

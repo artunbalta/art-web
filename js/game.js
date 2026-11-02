@@ -21,7 +21,7 @@ const Game = (() => {
     G.tr = buildTerrain();
     G.ground = renderGround(G.tr);
     buildCollision();
-    G.player = new Person(randomLook(store.get('lookSeed', (Math.random() * 1e9) | 0)), 73.5 * TILE, 25.4 * TILE, { speed: 72 });
+    G.player = new Person(randomLook(store.get('lookSeed', (Math.random() * 1e9) | 0)), 73.5 * TILE, 25.4 * TILE, { speed: 60 });
     G.player.isPlayer = true;
     G.entities.push(G.player);
     populateWorld(api);
@@ -42,10 +42,10 @@ const Game = (() => {
     const want = Math.min(cw, ch) < 600 ? 12 * TILE : 17 * TILE;
     G.scale = Math.max(1, Math.round(short / want));
     G.vw = Math.ceil(cw * dpr / G.scale); G.vh = Math.ceil(ch * dpr / G.scale);
-    cv.width = G.vw; cv.height = G.vh;
-    cv.style.width = (G.vw * G.scale / dpr) + 'px'; cv.style.height = (G.vh * G.scale / dpr) + 'px';
+    cv.width = G.vw + 1; cv.height = G.vh + 1;
+    cv.style.width = ((G.vw + 1) * G.scale / dpr) + 'px'; cv.style.height = ((G.vh + 1) * G.scale / dpr) + 'px';
     ctx.imageSmoothingEnabled = false;
-    lightCv.width = G.vw; lightCv.height = G.vh;
+    lightCv.width = G.vw + 1; lightCv.height = G.vh + 1;
     G.dpr = dpr;
   }
 
@@ -126,7 +126,7 @@ const Game = (() => {
       if (this.moving) this.anim += dt * (this.curSpeed() / 9);
       else this.anim = 0;
     }
-    curSpeed() { return this.speed * (this.boost && G.t < this.boost ? 1.65 : 1) * (this.running ? 1.55 : 1); }
+    curSpeed() { return this.speed * (this.boost && G.t < this.boost ? 2 : 1) * (this.running ? 2 : 1); }
     frame() {
       if (!this.moving) return 0;
       const f = Math.floor(this.anim) % 4;
@@ -219,6 +219,7 @@ const Game = (() => {
       SFX.unlock();
       if (UI.cvOpen) { if (k === 'Escape') UI.toggleCV(false); return; }
       if (G.mode === 'title') { if (!e.metaKey && !e.ctrlKey && !e.altKey && k !== 'Tab') start(); return; }
+      if (G.mode === 'starting') return;
       if (UI.mapOpen) { if (k === 'Escape' || k === 'm') UI.toggleMap(false); return; }
       if (UI.panelOpen) { if (k === 'Escape' || (k === 'e' && !G.panelKeys)) UI.closePanel(); if (G.panelKeys) G.panelKeys(e); return; }
       if (UI.talking) {
@@ -244,6 +245,7 @@ const Game = (() => {
       SFX.unlock();
       if (e.pointerType === 'touch') G.touch = true;
       if (G.mode === 'title') { start(); return; }
+      if (G.mode === 'starting') return;
       if (UI.busy || G.lockN > 0) { if (G.lockN > 0 && G.cutTap) G.cutTap(); return; }
       const wx = (e.clientX * G.dpr) / G.scale + G.cam.x, wy = (e.clientY * G.dpr) / G.scale + G.cam.y;
       tapAt(wx, wy);
@@ -370,22 +372,24 @@ const Game = (() => {
     catch (e) { if (!G.errLogged) { G.errLogged = true; console.error(e); } }
     requestAnimationFrame(loop);
   }
-  function start() {
+  async function start() {
     if (G.mode !== 'title') return;
+    G.mode = 'starting';
+    SFX.unlock(); SFX.musicStart();
+    await fade(true);
     G.mode = 'play';
     document.body.classList.add('playing');
-    SFX.unlock(); SFX.musicStart();
-    G.cam.x = G.player.x - G.vw / 2; G.cam.y = G.player.y - G.vh / 2;
+    G.cam.x = clamp(Math.round(G.player.x - G.vw / 2), 0, MAP_W * TILE - G.vw); G.cam.y = clamp(Math.round(G.player.y - 12 - G.vh / 2), 0, MAP_H * TILE - G.vh);
+    await wait(0.05); fade(false);
     setTimeout(() => Eggs.intro(), 700);
   }
 
   function update(dt) {
     const p = G.player;
     if (G.mode === 'title') {
-      // a slow drift across the world
-      const a = G.t * 0.05;
-      const tx = (MAP_W * TILE - G.vw) * (0.5 + Math.sin(a) * 0.45), ty = (MAP_H * TILE - G.vh) * (0.45 + Math.sin(a * 1.7) * 0.35);
-      G.cam.x += (tx - G.cam.x) * 0.01; G.cam.y += (ty - G.cam.y) * 0.01;
+      // a slow, steady drift around İstanbul, wide enough to show Ankara and London over time
+      const fx = 50 * TILE + Math.sin(G.t * 0.021) * 26 * TILE, fy = 25 * TILE + Math.sin(G.t * 0.033 + 0.6) * 9 * TILE;
+      G.cam.x = clamp(fx - G.vw / 2, 0, MAP_W * TILE - G.vw); G.cam.y = clamp(fy - G.vh / 2, 0, MAP_H * TILE - G.vh);
     } else {
       // movement
       if (!UI.busy && G.lockN === 0 && !interBusy) {
@@ -410,12 +414,12 @@ const Game = (() => {
         } else if (!p.path) p.moving = false;
       }
       if (!(UI.busy || G.lockN > 0) || p.path) p.update(dt);
-      // camera
-      const tx = clamp(p.x - G.vw / 2, 0, MAP_W * TILE - G.vw), ty = clamp(p.y - 12 - G.vh / 2, 0, MAP_H * TILE - G.vh);
-      const k = 1 - Math.pow(0.0005, dt);
-      G.cam.x += ((G.camFocus ? G.camFocus.x - G.vw / 2 : tx) - G.cam.x) * k;
-      G.cam.y += ((G.camFocus ? G.camFocus.y - G.vh / 2 : ty) - G.cam.y) * k;
-      if (G.camFocus) { G.cam.x = clamp(G.cam.x, 0, MAP_W * TILE - G.vw); G.cam.y = clamp(G.cam.y, 0, MAP_H * TILE - G.vh); }
+      // camera: whole pixels, locked to you (or to the train / the race), gliding only across big gaps
+      const fx = G.camFocus ? G.camFocus.x : p.x, fy = G.camFocus ? G.camFocus.y : p.y - 12;
+      const tx = clamp(Math.round(fx - G.vw / 2), 0, MAP_W * TILE - G.vw), ty = clamp(Math.round(fy - G.vh / 2), 0, MAP_H * TILE - G.vh);
+      const ddx = tx - G.cam.x, ddy = ty - G.cam.y;
+      if (Math.abs(ddx) <= 3 && Math.abs(ddy) <= 3) { G.cam.x = tx; G.cam.y = ty; }
+      else { const k = 1 - Math.pow(0.002, dt); G.cam.x += ddx * k; G.cam.y += ddy * k; }
       // zone label
       const z = zoneAt(Math.floor(p.x / TILE), Math.floor(p.y / TILE));
       if (z) { UI.zone(z.name, z.city); if (z.id !== G.zoneId) { if (G.zoneId) Eggs.observe('zone'); G.zoneId = z.id; } }
@@ -494,8 +498,15 @@ const Game = (() => {
 
   /* ================= rendering ================= */
   function render() {
-    const W = G.vw, H = G.vh;
-    let cx = Math.round(G.cam.x), cy = Math.round(G.cam.y);
+    const W = G.vw + 1, H = G.vh + 1;
+    let cx = Math.round(G.cam.x), cy = Math.round(G.cam.y), ox = 0, oy = 0;
+    if (G.mode === 'title') {
+      cx = Math.floor(G.cam.x); cy = Math.floor(G.cam.y);
+      ox = Math.round((G.cam.x - cx) * G.scale); oy = Math.round((G.cam.y - cy) * G.scale);
+      if (ox >= G.scale) { cx++; ox = 0; } if (oy >= G.scale) { cy++; oy = 0; }
+    }
+    const tf = ox || oy ? `translate(${-ox / G.dpr}px, ${-oy / G.dpr}px)` : '';
+    if (tf !== G.tf) { cv.style.transform = tf; G.tf = tf; }
     if (G.shake) { cx += Math.round((Math.random() - 0.5) * G.shake * 2); cy += Math.round((Math.random() - 0.5) * G.shake * 2); }
     G.cx = cx; G.cy = cy;
     ctx.fillStyle = C.w1; ctx.fillRect(0, 0, W, H);
@@ -623,7 +634,7 @@ const Game = (() => {
   function drawLighting(cx, cy) {
     const ph = dayPhase();
     G.phase = ph;
-    if (ph.warm > 0) { ctx.fillStyle = `rgba(255,150,80,${ph.warm * 0.55})`; ctx.fillRect(0, 0, G.vw, G.vh); }
+    if (ph.warm > 0) { ctx.fillStyle = `rgba(255,150,80,${ph.warm * 0.55})`; ctx.fillRect(0, 0, G.vw + 1, G.vh + 1); }
     if (ph.dark <= 0.01) return;
     // windows glow
     for (const o of G.objects) if (o.windows) for (const [x, y, w, h] of o.windows) {
@@ -632,8 +643,8 @@ const Game = (() => {
     }
     const lg = lightCv.g;
     lg.globalCompositeOperation = 'source-over';
-    lg.clearRect(0, 0, G.vw, G.vh);
-    lg.fillStyle = `rgba(18,16,48,${ph.dark})`; lg.fillRect(0, 0, G.vw, G.vh);
+    lg.clearRect(0, 0, G.vw + 1, G.vh + 1);
+    lg.fillStyle = `rgba(18,16,48,${ph.dark})`; lg.fillRect(0, 0, G.vw + 1, G.vh + 1);
     lg.globalCompositeOperation = 'destination-out';
     const lights = [];
     for (const o of G.objects) {
