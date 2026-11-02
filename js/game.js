@@ -28,6 +28,8 @@ const Game = (() => {
     resize();
     addEventListener('resize', resize);
     bindInput();
+    Pad.init();
+    if (G.touch) document.body.classList.add('touch');
     // start the camera somewhere pretty for the title screen
     G.cam.x = 64 * TILE; G.cam.y = 14 * TILE;
     UI.secrets(G.found.size, Object.keys(SECRETS).length);
@@ -114,19 +116,24 @@ const Game = (() => {
     }
     update(dt) {
       if (this.path && this.path.length) {
-        const [px, py] = this.path[0];
-        const dx = px - this.x, dy = py - this.y, d = Math.hypot(dx, dy);
-        const step = this.curSpeed() * dt;
-        if (d <= step + 0.01) { this.x = px; this.y = py; this.path.shift(); }
-        else { this.x += dx / d * step; this.y += dy / d * step; }
-        if (d > 0.5) this.dir = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'l' : 'r') : (dy < 0 ? 'u' : 'd');
+        // walk the path one whole pixel at a time (both axes together on diagonals), never on fractions
+        this.stepAcc = (this.stepAcc || 0) + this.curSpeed() * dt;
+        let n = 0;
+        while (this.stepAcc >= 1 && this.path.length && n++ < 8) {
+          this.stepAcc -= 1;
+          const [wx, wy] = this.path[0];
+          const ddx = wx - this.x, ddy = wy - this.y;
+          this.dir = Math.abs(ddx) >= Math.abs(ddy) && ddx ? (ddx < 0 ? 'l' : 'r') : ddy ? (ddy < 0 ? 'u' : 'd') : this.dir;
+          this.x += Math.sign(ddx); this.y += Math.sign(ddy);
+          if (this.x === wx && this.y === wy) this.path.shift();
+        }
         this.moving = true;
-        if (!this.path.length) { this.path = null; this.moving = false; if (this.onArrive) { const f = this.onArrive; this.onArrive = null; f(); } }
+        if (!this.path.length) { this.path = null; this.moving = false; this.stepAcc = 0; if (this.onArrive) { const f = this.onArrive; this.onArrive = null; f(); } }
       }
       if (this.moving) this.anim += dt * (this.curSpeed() / 9);
       else this.anim = 0;
     }
-    curSpeed() { return this.speed * (this.boost && G.t < this.boost ? 2 : 1) * (this.running ? 2 : 1); }
+    curSpeed() { return this.speed * (this.boost && G.t < this.boost ? 2 : 1) * (this.running || this.padRun ? 2 : 1); }
     frame() {
       if (!this.moving) return 0;
       const f = Math.floor(this.anim) % 4;
@@ -243,7 +250,7 @@ const Game = (() => {
     addEventListener('blur', () => { G.keys = {}; G.player.running = false; });
     cv.addEventListener('pointerdown', e => {
       SFX.unlock();
-      if (e.pointerType === 'touch') G.touch = true;
+      if (e.pointerType === 'touch' && !G.touch) { G.touch = true; document.body.classList.add('touch'); }
       if (G.mode === 'title') { start(); return; }
       if (G.mode === 'starting') return;
       if (UI.busy || G.lockN > 0) { if (G.lockN > 0 && G.cutTap) G.cutTap(); return; }
@@ -343,6 +350,13 @@ const Game = (() => {
   }
   let interBusy = false;
   function interact() { const it = nearest(); if (it) runInter(it); }
+  // the A button: advance a conversation if one is open, otherwise use whatever is in front of you
+  function action() {
+    if (G.mode !== 'play') return;
+    if (UI.talking) { UI.advance(); return; }
+    if (UI.busy || G.lockN > 0) return;
+    interact();
+  }
   async function runInter(it) {
     if (interBusy) return;
     interBusy = true;
@@ -379,7 +393,7 @@ const Game = (() => {
     await fade(true);
     G.mode = 'play';
     document.body.classList.add('playing');
-    G.cam.x = clamp(Math.round(G.player.x - G.vw / 2), 0, MAP_W * TILE - G.vw); G.cam.y = clamp(Math.round(G.player.y - 12 - G.vh / 2), 0, MAP_H * TILE - G.vh);
+    G.cam.x = clamp(Math.round(G.player.x) - (G.vw >> 1), 0, MAP_W * TILE - G.vw); G.cam.y = clamp(Math.round(G.player.y - 12) - (G.vh >> 1), 0, MAP_H * TILE - G.vh);
     await wait(0.05); fade(false);
     setTimeout(() => Eggs.intro(), 700);
   }
@@ -392,31 +406,29 @@ const Game = (() => {
       G.cam.x = clamp(fx - G.vw / 2, 0, MAP_W * TILE - G.vw); G.cam.y = clamp(fy - G.vh / 2, 0, MAP_H * TILE - G.vh);
     } else {
       // movement
+      // the player always stands on whole pixels (teleports can land on fractions)
+      if (p.x % 1 || p.y % 1) { p.x = Math.round(p.x); p.y = Math.round(p.y); }
+      p.padRun = Pad.st.run;
       if (!UI.busy && G.lockN === 0 && !interBusy) {
-        let dx = 0, dy = 0;
+        let sx = 0, sy = 0;
         const K = G.keys;
-        if (K.ArrowLeft || K.a) dx -= 1; if (K.ArrowRight || K.d) dx += 1;
-        if (K.ArrowUp || K.w) dy -= 1; if (K.ArrowDown || K.s) dy += 1;
-        if (dx || dy) {
+        if (K.ArrowLeft || K.a) sx -= 1; if (K.ArrowRight || K.d) sx += 1;
+        if (K.ArrowUp || K.w) sy -= 1; if (K.ArrowDown || K.s) sy += 1;
+        if (Pad.st.on) { sx = Pad.st.sx; sy = Pad.st.sy; p.padRun = Pad.st.run || Pad.st.mag > 0.97; }
+        if (sx || sy) {
           p.path = null; p.onArrive = null;
-          const len = Math.hypot(dx, dy), sp = p.curSpeed() * dt;
-          p.dir = dx < 0 ? 'l' : dx > 0 ? 'r' : dy < 0 ? 'u' : 'd';
-          if (dy && !dx) p.dir = dy < 0 ? 'u' : 'd';
-          // sub-pixel accumulation so slow speeds stay smooth
-          p.acc = p.acc || [0, 0];
-          p.acc[0] += dx / len * sp; p.acc[1] += dy / len * sp;
-          const mx = Math.trunc(p.acc[0]), my = Math.trunc(p.acc[1]);
-          p.acc[0] -= mx; p.acc[1] -= my;
-          let moved = false;
-          for (let i = 0; i < Math.abs(mx); i++) moved = p.move(Math.sign(mx), 0) || moved;
-          for (let i = 0; i < Math.abs(my); i++) moved = p.move(0, Math.sign(my)) || moved;
+          p.dir = sx < 0 ? 'l' : sx > 0 ? 'r' : sy < 0 ? 'u' : 'd';
+          // one accumulator for both axes: diagonals step x and y on the same frame, so nothing shimmers
+          p.stepAcc = (p.stepAcc || 0) + p.curSpeed() * dt;
+          let n = 0;
+          while (p.stepAcc >= 1 && n++ < 8) { p.stepAcc -= 1; if (sx) p.move(sx, 0); if (sy) p.move(0, sy); }
           p.moving = true;
-        } else if (!p.path) p.moving = false;
+        } else if (!p.path) { p.moving = false; p.stepAcc = 0; }
       }
       if (!(UI.busy || G.lockN > 0) || p.path) p.update(dt);
       // camera: whole pixels, locked to you (or to the train / the race), gliding only across big gaps
       const fx = G.camFocus ? G.camFocus.x : p.x, fy = G.camFocus ? G.camFocus.y : p.y - 12;
-      const tx = clamp(Math.round(fx - G.vw / 2), 0, MAP_W * TILE - G.vw), ty = clamp(Math.round(fy - G.vh / 2), 0, MAP_H * TILE - G.vh);
+      const tx = clamp(Math.round(fx) - (G.vw >> 1), 0, MAP_W * TILE - G.vw), ty = clamp(Math.round(fy) - (G.vh >> 1), 0, MAP_H * TILE - G.vh);
       const ddx = tx - G.cam.x, ddy = ty - G.cam.y;
       if (Math.abs(ddx) <= 3 && Math.abs(ddy) <= 3) { G.cam.x = tx; G.cam.y = ty; }
       else { const k = 1 - Math.pow(0.002, dt); G.cam.x += ddx * k; G.cam.y += ddy * k; }
@@ -450,6 +462,11 @@ const Game = (() => {
     G.bubbles = G.bubbles.filter(b => b.until > G.t);
     if (G.shake > 0) G.shake = Math.max(0, G.shake - dt * 12);
     if (G.flash > 0) G.flash = Math.max(0, G.flash - dt * 3);
+    if (G.touch) {
+      const canAct = G.mode === 'play' && !UI.busy && G.lockN === 0 && !interBusy;
+      const it = canAct && !G.player.path ? nearest() : null;
+      Pad.sync(canAct, it ? (it.label || 'use').toUpperCase() : null);
+    }
     updateRain(dt);
     Eggs.tick(dt);
   }
@@ -713,14 +730,15 @@ const Game = (() => {
     lock(); await fade(true);
     G.player.x = pl.x * TILE; G.player.y = pl.y * TILE; G.player.dir = 'd'; G.player.path = null;
     if (Eggs.follower) { Eggs.follower.x = G.player.x + 12; Eggs.follower.y = G.player.y; }
-    G.cam.x = clamp(G.player.x - G.vw / 2, 0, MAP_W * TILE - G.vw); G.cam.y = clamp(G.player.y - 12 - G.vh / 2, 0, MAP_H * TILE - G.vh);
+    G.player.x = Math.round(G.player.x); G.player.y = Math.round(G.player.y);
+    G.cam.x = clamp(G.player.x - (G.vw >> 1), 0, MAP_W * TILE - G.vw); G.cam.y = clamp(G.player.y - 12 - (G.vh >> 1), 0, MAP_H * TILE - G.vh);
     await wait(0.15); await fade(false); unlock();
     if (pl.x < 27 && !flag('trainHint')) { flag('trainHint', 1); UI.toast('Fast travel works. The <b>spike train</b> is more fun, though.'); }
   }
 
   const api = {
     G, init, start, Person, building, prop, npc, entity, addObj, addInter, speaker, secret, flag, particle, burst, heart, bubble,
-    lock, unlock, wait, fade, walkTo, stamp, nearWater, groundAt, drawMap, travel, free,
+    lock, unlock, wait, fade, walkTo, stamp, nearWater, groundAt, drawMap, travel, free, action,
     get player() { return G.player; }, get t() { return G.t; }, found: () => G.found,
     setTimeShift(h) { G.timeShift = h; }, get phase() { return G.phase || dayPhase(); },
   };

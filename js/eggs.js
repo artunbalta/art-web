@@ -23,7 +23,7 @@ const Eggs = (() => {
   /* ================= people ================= */
   E.intro = async () => {
     const back = Game.flag('met');
-    UI.toast(Game.G.touch ? 'Tap to walk · tap things to use them' : '<b>WASD</b> / arrows to walk · <b>E</b> to interact · <b>M</b> for the map', 6500);
+    UI.toast(Game.G.touch ? 'Joystick to walk · <b>A</b> to interact · or just tap where you want to go' : '<b>WASD</b> / arrows to walk · <b>E</b> to interact · <b>M</b> for the map', 6500);
     if (!back) setTimeout(() => Game.bubble(E.artunEnt, 'HEY! OVER HERE!', 3500), 900);
     else setTimeout(() => UI.toast(`Welcome back. <b>✦ ${Game.found().size}/${total()}</b> secrets so far.`), 7000);
   };
@@ -520,7 +520,7 @@ const Eggs = (() => {
     const c = await choose(NAR, onIsland ? 'Row back to the İstanbul pier?' : 'A little rowboat. The oars look borrowed. Row out to the island in the Channel?', ['Row', 'Stay']);
     if (c) return;
     UI.endDlg(); Game.lock(); await Game.fade(true);
-    if (onIsland) { P().x = 36.4 * 16; P().y = 46 * 16; } else { P().x = 33.4 * 16; P().y = 12.6 * 16; }
+    if (onIsland) { P().x = 582; P().y = 736; } else { P().x = 534; P().y = 202; }
     P().dir = 'd'; if (E.follower) { E.follower.x = P().x + 10; E.follower.y = P().y; }
     await Game.wait(0.4); await Game.fade(false); Game.unlock();
   };
@@ -683,7 +683,7 @@ const Eggs = (() => {
     await new Promise(res => { TR.onArrive = res; });
     parkTrain(true);
     await Game.wait(0.5);
-    p.x = dir < 0 ? 17.5 * 16 : 46 * 16; p.y = 35.7 * 16; p.dir = 'd';
+    p.x = dir < 0 ? 280 : 736; p.y = 571; p.dir = 'd';
     if (E.follower) { E.follower.x = p.x + 12; E.follower.y = p.y; E.follower.hidden = false; }
     p.hidden = false;
     Game.G.camFocus = null; Game.unlock();
@@ -735,26 +735,26 @@ const Eggs = (() => {
   }
   class Dog {
     // follows the exact path you walked, a fixed distance behind — no catching up, no stop-start flicker
-    constructor(x, y) { this.s = makeDog(); this.x = x; this.y = y; this.dir = 'r'; this.state = 'sit'; this.blocks = false; this.shadowR = 6; this.path = [[x, y]]; this.walked = 0; this.stillT = 9; }
+    constructor(x, y) { this.s = makeDog(); this.x = Math.round(x); this.y = Math.round(y); this.dir = 'r'; this.state = 'sit'; this.blocks = false; this.shadowR = 6; this.path = [[this.x, this.y]]; this.walked = 0; this.stillT = 9; }
     update(dt) {
       if (this.state !== 'follow') return;
       const p = P();
       if (p.hidden) return;
+      const px = Math.round(p.x), py = Math.round(p.y);
       const last = this.path[this.path.length - 1];
-      if (Math.hypot(p.x - last[0], p.y - last[1]) > 64) this.path = [[this.x, this.y]]; // you teleported (map, train, boat)
+      if (Math.hypot(px - last[0], py - last[1]) > 64) { this.x = Math.round(this.x); this.y = Math.round(this.y); this.path = [[this.x, this.y]]; } // teleported
       const tail = this.path[this.path.length - 1];
-      if (Math.hypot(p.x - tail[0], p.y - tail[1]) >= 1) this.path.push([p.x, p.y]);
-      // the point LAG px back along your trail
+      if (px !== tail[0] || py !== tail[1]) this.path.push([px, py]);
+      // stand on the pixel you stood on LAG px of walking ago — he steps exactly when you step
       const LAG = 24;
-      let need = LAG, ax = p.x, ay = p.y, tx = this.x, ty = this.y, found = false;
+      let need = LAG, ax = px, ay = py, tx = this.x, ty = this.y;
       for (let i = this.path.length - 1; i >= 0; i--) {
-        const [qx, qy] = this.path[i], seg = Math.hypot(ax - qx, ay - qy);
-        if (seg >= need) { const k = need / seg; tx = ax + (qx - ax) * k; ty = ay + (qy - ay) * k; found = true; if (i > 1) this.path.splice(0, i - 1); break; }
-        need -= seg; ax = qx; ay = qy;
+        const [qx, qy] = this.path[i];
+        need -= Math.hypot(ax - qx, ay - qy); ax = qx; ay = qy;
+        if (need <= 0) { tx = qx; ty = qy; if (i > 1) this.path.splice(0, i - 1); break; }
       }
-      if (!found) { tx = this.x; ty = this.y; } // trail shorter than LAG: you're right next to him, he waits
       const dx = tx - this.x, dy = ty - this.y, step = Math.hypot(dx, dy);
-      if (step > 0.05) {
+      if (step > 0) {
         this.x = tx; this.y = ty; this.walked += step; this.stillT = 0;
         if (Math.abs(dx) > step * 0.35) this.dir = dx < 0 ? 'l' : 'r';
       } else this.stillT += dt;
