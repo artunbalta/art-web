@@ -15,7 +15,8 @@ const ME = {
   volina: 'https://volina.ai',
   echo: 'https://echovirtualworld.com',
   scrollio: 'https://scrollio.co',
-  cv: 'assets/Artun_Balta_CV.pdf',
+  chalk: 'https://educhalk.com',
+  cv:'assets/Artun_Balta_CV.pdf',
 };
 
 const CV = {
@@ -24,7 +25,7 @@ const CV = {
     { id: 'imperial', org: 'Imperial College London', role: 'MRes Neurotechnology', where: 'London, UK', when: '2026 – 2027',
       points: ['Thesis (supervisor: Dr. Andriy Kozlov): <em>Auditory Attention Decoding — Adapting Dynamic Spectrotemporal Receptive Fields to Single-Neuron Spike Recordings.</em> Extends deep-network dSTRF estimation from population-level ECoG to single-unit spike trains, introducing Poisson likelihood formulations and sparsity handling to characterise nonlinear tuning in the auditory pathway.'] },
     { id: 'bilkent', org: 'İhsan Doğramacı Bilkent University', role: 'B.Sc. Electrical and Electronics Engineering', where: 'Ankara, Türkiye', when: '2021 – 2026',
-      points: ['<b>1st Place</b> (12 teams), Graduation Project Competition — with <a href="https://scrollio.co" target="_blank" rel="noopener">Scrollio</a>', '<b>2nd Place</b> (45 teams), Bilkentpreneurs Challenge 2026 — $3,000 in prize funding', 'Bilkent Entrepreneurship Award'] },
+      points: ['<b>1st Place</b> (12 teams), Graduation Project Competition — with <a href="https://scrollio.co" target="_blank" rel="noopener">Scrollio</a>', '<b>2nd Place</b> (45 teams), Bilkentpreneurs Challenge 2026, with <a href="https://educhalk.com" target="_blank" rel="noopener">Chalk</a> — $3,000 in prize funding', 'Bilkent Entrepreneurship Award'] },
     { id: 'lycee', org: 'Lycée Tevfik Fikret', role: 'High School, Mathematics & Sciences', where: 'Ankara, Türkiye', when: '2010 – 2021',
       points: ['High Honour graduate on academic scholarship', 'Top 0.2% nationally in the YKS 2021 entrance exam, among 3M+ candidates', '<b>2nd Place</b>, Mathématiques Sans Frontières'] },
   ],
@@ -108,6 +109,13 @@ const PANELS = {
   ta: () => ({ kicker: 'School Hill · 2023–2024', title: 'Physics Lab · Teaching Assistant', accent: 'blue', body: entryHTML(byId(CV.experience, 'ta')) + aside('Most-asked question: “Is this on the exam?” Answer, every time: gravity is on every exam. You’re taking it right now.') }),
   volina: () => ({ kicker: 'Work Street · 2025–now', title: 'volina.', accent: 'violet', body: entryHTML(byId(CV.experience, 'volina'), `<p><a href="${ME.volina}" target="_blank" rel="noopener">volina.ai ↗</a></p>`) + aside('Voli, our mascot, is standing outside. If a phone rings somewhere in London, that’s probably Voli too.') }),
   scrollio: () => ({ kicker: 'School Hill · graduation project', title: 'Scrollio', accent: 'gold', body: projectHTML(byId(CV.projects, 'scrollio'), `<p><a href="${ME.scrollio}" target="_blank" rel="noopener">scrollio.co ↗</a></p>`) + aside('The giant phone outside lets you draw a mentor. It moves in next to the phone.') }),
+  chalk: () => ({ kicker: 'School Hill · Bilkentpreneurs 2026', title: 'Chalk', accent: 'green',
+    body: `<p class="lead">One lesson video in, a whole curriculum out, tailored to every student in the class.</p>
+      <ul><li><b>Upload, and that’s it.</b> A teacher uploads a lesson they have already recorded, in any format. Nothing to install, nothing to integrate.</li>
+      <li><b>Chalk does the rest.</b> It analyses the video in seconds and builds MEB-aligned lessons for beginner, intermediate and advanced students, then generates quizzes, summaries and practice so each student moves at their own pace.</li>
+      <li><b>Made for schools in Türkiye:</b> KVKK-compliant, with data kept on servers in Türkiye, and already being trialled at leading schools.</li>
+      <li>Won us <b>$3,000</b> in prize funding at the Bilkentpreneurs Challenge 2026. Hence the cheque.</li></ul>
+      <p><a href="${ME.chalk}" target="_blank" rel="noopener">educhalk.com ↗</a></p>${aside('The motto, in Turkish: “Yorulmadan öğretin.” Teach without wearing yourself out.')}` }),
   echo: () => ({ kicker: 'Lab Garden · side project', title: 'echo', accent: 'violet', body: projectHTML(byId(CV.projects, 'echo'), `<p><a href="${ME.echo}" target="_blank" rel="noopener">echovirtualworld.com ↗</a></p>`) + aside('This little world has been doing a tiny version of the same thing to you since you arrived. Step through the doorway.') }),
   aselsan: () => ({ kicker: 'Work Street · summer 2024', title: 'ASELSAN · Radar Intern', accent: 'navy', body: entryHTML(byId(CV.experience, 'aselsan')) + aside('The radar in the yard still works. Ask the guard nicely.') }),
   mimlab: () => ({ kicker: 'Boğaziçi Hill · 2025–2026', title: 'Boğaziçi MIMLAB', accent: 'red', body: entryHTML(byId(CV.experience, 'mimlab')) + aside('There’s a workload test at the terminal by the door. Your brain will hate it.') }),

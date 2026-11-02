@@ -167,6 +167,8 @@ function buildTerrain() {
 /* =====================================================================
    populateWorld — every building, prop and person, placed by hand.
    ===================================================================== */
+// the ASELSAN gate: a two-tile gap in the fence line (px), closed by a boom until the guard lets you in
+const ASELSAN_GATE = { x: 89 * 16, y: Math.round(31.9 * 16), w: 32 };
 const TRAVEL = [
   { name: 'Home', x: 73.5, y: 25.6 }, { name: 'School Hill', x: 70, y: 11.6 }, { name: 'Lab Garden', x: 73.5, y: 36.6 },
   { name: 'Work Street', x: 86.5, y: 27.2 }, { name: 'Boğaziçi', x: 48.5, y: 10.4 }, { name: 'Tea Garden', x: 49, y: 22 },
@@ -225,6 +227,10 @@ function populateWorld(W) {
   const radar = W.prop('radar', 91.4, 35.2, { act: E.radar, label: 'use', id: 'radar' });
   radar.post = (g, x, y, t) => E.drawRadarDish(g, x + 15, y + 9, t);
   W.npc('guard', 89.5, 31.4, { act: E.guard, label: 'talk', id: 'guard' });
+  // the boom across the gate: down, and solid, until the guard has had a word with you
+  const gate = ASELSAN_GATE;
+  W.addObj({ x: gate.x, y: gate.y, sortY: gate.y, vw: gate.w + 10, vh: 50, dx: 0, dy: -46, draw: E.drawBoom });
+  W.stamp(gate.x, gate.y - 3, gate.w, 4);
   W.prop('signpost', 87.6, 30.6, { opts: { lines: ['RESTRICTED'] }, act: E.guard, label: 'read' });
   for (const [x, y, k] of [[93.2, 18.6, 'pine'], [92.9, 23, 'green'], [84.5, 31.5, 'green'], [94.2, 29.5, 'pine']]) tree(x, y, k);
   lamp(85.4, 27.9); lamp(92.4, 27.9);

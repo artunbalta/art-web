@@ -178,7 +178,7 @@ PROPS.chain = () => {
 PROPS.chainV = () => {
   const W = 4, H = 34, cv = canvas(W, H), g = cv.g;
   rect(g, 1, 0, 2, 32, C.t1); vl(g, 1, 0, 31, C.t3);
-  return { img: cv, ox: 2, gy: 31, solid: [4, 16], shadow: null };
+  return { img: cv, ox: 2, gy: 31, solid: [4, 32], shadow: null };   // the full 2 tiles: no slipping between posts
 };
 
 PROPS.lamp = (o = {}) => {
@@ -460,11 +460,14 @@ PROPS.trophy = () => {
   return { img: cv, ox: 10, gy: 32, solid: [14, 5], shadow: [7, 2] };
 };
 PROPS.bigCheck = () => {
-  const W = 70, H = 30, cv = canvas(W, H), g = cv.g;
-  for (const x of [12, 56]) rect(g, x, 20, 2, 9, C.k1);
-  rect(g, 0, 2, W, 20, C.white); outlineRect(g, 0, 2, W, 20, C.ink2); rect(g, 1, 3, W - 2, 4, C.c2);
-  text(g, 'BILKENTPRENEURS', 4, 8, C.ink); text(g, '$3,000', 4, 15, C.g1); text(g, '2ND', 52, 15, C.r2); line(g, 30, 19, 48, 16, C.b1);
-  return { img: cv, ox: W / 2, gy: 28, solid: [W - 6, 4], shadow: [W / 2 - 2, 2] };
+  // the face says the sum; a little chalkboard tag tied under it says who won it
+  const W = 74, H = 36, cv = canvas(W, H), g = cv.g;
+  for (const x of [12, 56]) rect(g, x, 20, 2, 15, C.k1);
+  rect(g, 0, 2, 70, 20, C.white); outlineRect(g, 0, 2, 70, 20, C.ink2); rect(g, 1, 3, 68, 4, C.c2);
+  text(g, 'BILKENTPRENEURS', 4, 8, C.ink); text(g, '$3,000', 4, 15, C.g1); line(g, 30, 19, 48, 16, C.b1);
+  line(g, 58, 22, 59, 23, C.ink2);
+  rect(g, 49, 23, 22, 9, C.k2); rect(g, 50, 24, 20, 7, '#2f4a3f'); hl(g, 50, 69, 24, '#3c5c4e'); text(g, 'Chalk', 51, 25, C.white);
+  return { img: cv, ox: 35, gy: 34, solid: [64, 4], shadow: [33, 2] };
 };
 PROPS.voli = () => {
   const W = 30, H = 48, cv = canvas(W, H), g = cv.g;

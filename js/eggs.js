@@ -66,18 +66,35 @@ const Eggs = (() => {
     if (it.ent.name === 'Ece') await say(SP.ece, ['Is this going to be on the exam?', '…Our TA used to say “gravity is on every exam. You’re taking it right now.” I still don’t know if that was a joke.']);
     else await say(SP.mert, ['PHYS102 lab report due Friday. I measured g as 11.2.', 'The TA wrote “bold” in the margin. Just “bold”.']);
   };
+  // the boom stays down until you've had a word with the guard. Permission lasts one visit ("five minutes").
+  let gateOpen = false, gateT = 0;
   E.guard = async () => {
-    if (!Game.flag('radarOk')) {
-      await say(SP.guard, ['Restricted area.', '…', 'You know Artun? He interned here in summer 2024. Kept saying “constant false alarm rate” at lunch.', 'Fine. You can use the radar in the yard. Five minutes. Don’t tell anyone. Especially not the radar.']);
-      Game.flag('radarOk', 1); openGate();
-    } else await say(SP.guard, ['The radar sees things you haven’t found yet. That’s the whole point of radar.']);
+    if (gateOpen) return say(SP.guard, ['The radar sees things you haven’t found yet. That’s the whole point of radar.']);
+    if (Game.flag('radarOk')) await say(SP.guard, ['Restricted area.', '…Oh, it’s you again. Same deal as last time: five minutes, and not a word to the radar.']);
+    else await say(SP.guard, ['Restricted area.', '…', 'You know Artun? He interned here in summer 2024. Kept saying “constant false alarm rate” at lunch.', 'Fine. You can use the radar in the yard. Five minutes. Don’t tell anyone. Especially not the radar.']);
+    Game.flag('radarOk', 1); openGate();
   };
   function openGate() {
-    const g = E.guardEnt; if (!g) return;
+    const g = E.guardEnt; if (!g || gateOpen) return;
+    gateOpen = true; gateT = Game.G.t; SFX.select();
+    Game.stamp(ASELSAN_GATE.x, ASELSAN_GATE.y - 3, ASELSAN_GATE.w, 4, 0);
     Game.stamp(g.x - 4, g.y - 3, 8, 5, 0);
     g.x = 91.6 * 16; g.y = 30.6 * 16; g.home = { x: g.x, y: g.y }; g.dir = 'l';
     Game.stamp(g.x - 4, g.y - 3, 8, 5, 1);
   }
+  // red-and-white arm on a yellow post just right of the opening; it swings up once the gate opens
+  E.drawBoom = (g, cx, cy, t) => {
+    const x = ASELSAN_GATE.x + ASELSAN_GATE.w - cx, y = ASELSAN_GATE.y - cy;
+    const k = gateOpen ? Math.min(1, (t - gateT) / 0.7) : 0, a = (1 - Math.cos(k * Math.PI)) * Math.PI / 4;
+    const arm = [];
+    for (let i = 0; i < 31; i++) arm.push([Math.round(x - 1 - Math.cos(a) * i), Math.round(y - 12 - Math.sin(a) * i), (i >> 2) & 1 ? C.white : C.r2]);
+    for (const [ax, ay] of arm) rect(g, ax - 1, ay - 1, 4, 4, C.ink);
+    for (const [ax, ay, col] of arm) rect(g, ax, ay, 2, 2, col);
+    rect(g, x + 1, y - 7, 3, 7, C.t1); vl(g, x + 1, y - 7, y - 1, C.t2);
+    rect(g, x - 1, y - 16, 7, 10, C.ink); rect(g, x, y - 15, 5, 8, C.y2); hl(g, x, x + 4, y - 15, C.y3);
+    for (let i = 0; i < 3; i++) px(g, x + 1 + i, y - 10 + i, C.ink);
+    px(g, x + 1, y - 13, C.t0);
+  };
   E.prof = async () => {
     await say(SP.prof, ['Looking for Artun? Probably fitting a Poisson model.', 'Or out on the lawn “doing fieldwork” at the cocktail party. Fieldwork. Honestly.']);
   };
@@ -144,7 +161,12 @@ const Eggs = (() => {
     const c = await choose(NAR, '1ST PLACE — Graduation Project Competition, out of 12 teams. Engraved underneath: “Scrollio”.', ['Polish it', 'Admire from a distance']);
     if (c === 0) { Game.burst(77.4 * 16, 11.4 * 16, 16, [C.y3, C.white, C.y4], 35); SFX.coin(); await say(NAR, ['You polish it until you can see your own sprite in it.']); secret('trophy'); }
   };
-  E.check = () => say(NAR, ['A comically large cheque: Bilkentpreneurs Challenge 2026, 2nd place out of 45 teams — $3,000 in prize funding.', 'The bank refused to accept it. Not the money. The cheque. Physically. Too big for the slot.']);
+  E.check = async () => {
+    await say(NAR, ['A comically large cheque: $3,000 in prize funding from the Bilkentpreneurs Challenge 2026. A little chalkboard tag is tied to it. It says “Chalk”.']);
+    const c = await choose(NAR, 'Chalk is what won it: an AI for teachers that turns one lesson video into a whole curriculum, with lessons for every level.', ['More about Chalk', 'Try to cash it', 'Leave']);
+    if (c === 0) return UI.panel('chalk');
+    if (c === 1) await say(NAR, ['The bank refused to accept it. Not the money. The cheque. Physically. Too big for the slot.']);
+  };
   E.physics = async () => { await UI.panel('ta'); };
   E.apple = async () => {
     const c = await choose(NAR, 'An apple tree by the physics lab. Feels symbolic.', ['Shake it', 'Leave it alone']);
@@ -173,7 +195,7 @@ const Eggs = (() => {
 
   /* ---------- radar: shows where the secrets you haven't found are ---------- */
   E.radar = async () => {
-    if (!Game.flag('radarOk')) { await say(NAR, ['A big radar dish. It is spinning with great confidence.', '(The guard at the gate is watching you very hard.)']); return; }
+    if (!gateOpen) { await say(NAR, ['A big radar dish. It is spinning with great confidence.', '(The guard at the gate is watching you very hard.)']); return; }
     const c = canvas(220, 220); c.className = 'scope';
     const node = html(`<p class="lead">Airborne-radar habits die hard. CFAR thresholding, tuned to find <b>things you haven’t found yet</b>.</p>`);
     node.appendChild(c);
@@ -992,7 +1014,6 @@ const Eggs = (() => {
     });
     E.artunEnt = ents.find(e => e.look === LOOKS.artun);
     E.guardEnt = byLook('guard')[0];
-    if (Game.flag('radarOk')) openGate();
     // Paşa — Artun's dog — waits by the door
     const pasa = Game.entity(new Dog(71.4 * 16, 25.2 * 16));
     Game.addInter({ ent: pasa, r: 16, label: 'pet', fn: async () => {
