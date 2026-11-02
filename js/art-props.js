@@ -202,17 +202,18 @@ PROPS.bench = (o = {}) => {
   return { img: cv, ox: 13, gy: 14, solid: [24, 5], shadow: [12, 2] };
 };
 PROPS.signpost = (o = {}) => {
-  const lines = o.lines || ['HELLO'];
-  const tw = Math.max(...lines.map(textWidth)) + 9;
+  // a line is 'TEXT' (board points right) or ['TEXT', dir]: l / r point the board, u / d paint an arrow on it
+  const lines = (o.lines || ['HELLO']).map(l => Array.isArray(l) ? l : [l, 'r']).map(([t, d]) => [d === 'u' ? '↑ ' + t : d === 'd' ? '↓ ' + t : t, d]);
+  const tw = Math.max(...lines.map(([t]) => textWidth(t))) + 9;
   const W = tw + 4, H = 22 + lines.length * 10, cv = canvas(W, H), g = cv.g;
   const px0 = Math.floor(W / 2) - 1;
   rect(g, px0, 4, 3, H - 6, C.k1); vl(g, px0, 4, H - 3, C.k2);
-  lines.forEach((t, i) => {
-    const y = 2 + i * 10, right = i % 2 === 0;
+  lines.forEach(([t, d], i) => {
+    const y = 2 + i * 10;
     const x = 2;
     rect(g, x, y, tw - 2, 8, C.k3); hl(g, x, x + tw - 3, y, C.k4); hl(g, x, x + tw - 3, y + 7, C.k1);
-    if (right) { px(g, x + tw - 2, y + 2, C.k3); rect(g, x + tw - 2, y + 2, 1, 4, C.k3); px(g, x + tw - 1, y + 3, C.k3); px(g, x + tw - 1, y + 4, C.k3); }
-    else { rect(g, x - 1, y + 2, 1, 4, C.k3); px(g, x - 2, y + 3, C.k3); px(g, x - 2, y + 4, C.k3); }
+    if (d === 'r') { px(g, x + tw - 2, y + 2, C.k3); rect(g, x + tw - 2, y + 2, 1, 4, C.k3); px(g, x + tw - 1, y + 3, C.k3); px(g, x + tw - 1, y + 4, C.k3); }
+    else if (d === 'l') { rect(g, x - 1, y + 2, 1, 4, C.k3); px(g, x - 2, y + 3, C.k3); px(g, x - 2, y + 4, C.k3); }
     text(g, t, x + 3, y + 2, C.k0);
   });
   hl(g, px0 - 1, px0 + 3, H - 2, C.k0);

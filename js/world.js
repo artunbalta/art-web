@@ -206,7 +206,7 @@ function populateWorld(W) {
   W.prop('bench', 69, 27.6, { label: 'sit' });
   W.prop('bench', 78.2, 27.6, { act: E.bench, label: 'sit', id: 'bench' });
   W.prop('bigsign', 70.2, 31.7, { opts: { lines: ['HOŞ GELDİN', 'WELCOME TO BALTAKÖY', 'POP. 1 (+YOU)'] }, act: E.welcome, label: 'read' });
-  W.prop('signpost', 77, 31.5, { opts: { lines: ['ISTANBUL', 'LAB GARDEN', 'SCHOOL HILL', 'WORK ST.'] }, act: E.signpost, label: 'read' });
+  W.prop('signpost', 77, 31.5, { opts: { lines: [['SCHOOL HILL', 'u'], ['ISTANBUL', 'l'], ['WORK ST.', 'r'], ['LAB GARDEN', 'd']] }, act: E.signpost, label: 'read' });
   lamp(66.4, 24.6); lamp(80.6, 24.6); lamp(66.4, 30.9); lamp(80.6, 30.9);
   W.npc('artun', 76.2, 26.3, { act: E.artun, label: 'talk', dir: 'l', id: 'artun' });
   W.npc('teyze', 69, 29, { act: E.teyze, label: 'talk', id: 'teyze' });

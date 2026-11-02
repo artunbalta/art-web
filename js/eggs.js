@@ -128,7 +128,7 @@ const Eggs = (() => {
     secret('bench');
   };
   E.welcome = () => say(NAR, ['HOŞ GELDİN — welcome to Baltaköy. Population: 1 (+ you).', '(“Köy” means village. “Balta” means axe. The axe is around here somewhere.)']);
-  E.signpost = () => say(NAR, ['West: İstanbul, over the Bosphorus bridge. South: the Lab Garden. Up the stairs: School Hill. East: Work Street.', 'London is not on this sign. London is a train ride away.']);
+  E.signpost = () => say(NAR, ['Up the stairs: School Hill. West: İstanbul, over the Bosphorus bridge. East: Work Street. South: the Lab Garden.', 'London is not on this sign. London is a train ride away.']);
   E.lycee = async () => { await say(NAR, ['Bonjour ! The corridors smell faintly of croissants and exam anxiety.']); await UI.panel('lycee'); };
   E.msf = async () => {
     await say(NAR, ['A chalkboard. “Mathématiques Sans Frontières — problème du jour.”']);
