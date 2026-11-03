@@ -51,7 +51,7 @@ const CV = {
   experience: [
     { id: 'volina', org: 'volina.', role: 'Co-Founder', where: 'Ankara, Türkiye', when: '2025 – present', link: 'https://volina.ai',
       points: ['AI voice-agent platform for Turkish health-tourism dental clinics, re-engaging dormant international leads with agents that profile callers in real time and adapt tone, objection handling and pacing mid-conversation.',
-        'Delivered <b>five clinic pilots</b> covering roughly <b>40,000 leads</b>, with per-pilot conversion rates of <b>1.2% to 3.8%</b>. KVKK and GDPR-compliant call handling and consent capture are built into the platform.'] },
+        'Delivered <b>five clinic pilots</b> covering roughly <b>40,000 leads</b>, raising the conversion rate to approximately <b>5.4%</b>, with KVKK and GDPR-compliant call handling and consent capture built into the platform.'] },
     { id: 'mimlab', org: 'Boğaziçi University MIMLAB', role: 'Volunteer Researcher', where: 'İstanbul, Türkiye', when: '2025 – 2026',
       points: ['Multimodal EEG preprocessing and classification: adaptive filtering against physiological reference channels, artefact evaluation, ERP extraction from n-back tasks, and machine-learning models for cognitive-workload state classification.'] },
     { id: 'aselsan', org: 'ASELSAN', role: 'Radar Systems Engineering Intern', where: 'Ankara, Türkiye', when: 'July – August 2024',
