@@ -100,6 +100,7 @@ function buildTerrain() {
   tr.rect(81, 26, 93, 27, T.PATH);                     // Work Street
   tr.rect(89, 28, 90, 31, T.PATH);                     // ASELSAN gate
   tr.rect(86, 32, 92, 40, T.PATH);                     // ASELSAN yard
+  tr.rect(85, 40, 91, 41, T.PATH);                     // ASELSAN forecourt, off the Lab Garden path
   // the Lab Garden: a loop with a spine
   tr.rect(72, 31, 74, 35, T.PATH);
   tr.rect(64, 36, 84, 37, T.PATH); tr.rect(64, 36, 65, 52, T.PATH); tr.rect(83, 36, 84, 52, T.PATH);
@@ -219,10 +220,10 @@ function populateWorld(W) {
   W.building('volina', 83, 25, { act: E.volina, label: 'enter', id: 'volina' });
   W.prop('voli', 91.6, 25.3, { act: E.voli, label: 'say hi', id: 'voli' });
   W.prop('bench', 88.4, 29.4);
-  // ASELSAN compound
+  // ASELSAN compound: the building is the south wall, door facing the public forecourt; the radar yard behind it is the guarded bit
   for (let x = 86; x <= 93; x++) if (x !== 89 && x !== 90) W.prop('chain', x + 0.5, 31.9);
-  for (let x = 86; x <= 93; x++) W.prop('chain', x + 0.5, 41.2);
-  for (let y = 32; y <= 40; y += 2) { W.prop('chainV', 85.6, y + 1.9); W.prop('chainV', 93.4, y + 1.9); }
+  for (let y = 33.6; y <= 39.6; y += 2) { W.prop('chainV', 85.6, y); W.prop('chainV', 93.4, y); }
+  W.prop('chain', 86.1, 39.6); W.prop('chain', 93, 39.6);   // close the slivers either side of the building
   W.building('aselsan', 86.6, 39.6, { act: E.aselsan, label: 'enter', id: 'aselsan' });
   const radar = W.prop('radar', 91.4, 35.2, { act: E.radar, label: 'use', id: 'radar' });
   radar.post = (g, x, y, t) => E.drawRadarDish(g, x + 15, y + 9, t);
