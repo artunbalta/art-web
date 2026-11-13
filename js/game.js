@@ -201,7 +201,7 @@ const Game = (() => {
     Eggs.observe('secret');
     const n = G.found.size, total = Object.keys(SECRETS).length;
     UI.secrets(n, total);
-    UI.toast(`<b>✦ Secret</b> ${SECRETS[id]} <i>${n}/${total}</i>`);
+    UI.toast(`<b>✦ ${L('Secret', 'Sır')}</b> ${SECRETS[id]} <i>${n}/${total}</i>`);
     SFX.secret();
     burst(G.player.x, G.player.y - 20, 14, [C.y3, C.white, C.p2]);
     if (n === total) setTimeout(() => Eggs.allFound(), 1800);
@@ -397,6 +397,19 @@ const Game = (() => {
     await wait(0.05); fade(false);
     setTimeout(() => Eggs.intro(), 700);
   }
+  // after a language switch the page reloads: straight back to where you stood, no title, no intro
+  function resume(st) {
+    if (G.mode !== 'title') return;
+    G.player.x = Math.round(st.x); G.player.y = Math.round(st.y); G.player.dir = st.dir || 'd';
+    if (st.touch) { G.touch = true; document.body.classList.add('touch'); }
+    if (Eggs.follower) { Eggs.follower.x = G.player.x + 12; Eggs.follower.y = G.player.y; }
+    G.mode = 'play';
+    document.body.classList.add('playing');
+    G.cam.x = clamp(G.player.x - (G.vw >> 1), 0, MAP_W * TILE - G.vw); G.cam.y = clamp(G.player.y - 12 - (G.vh >> 1), 0, MAP_H * TILE - G.vh);
+    // the browser wants a gesture before it plays anything
+    const wake = () => { SFX.unlock(); SFX.musicStart(); removeEventListener('pointerdown', wake); removeEventListener('keydown', wake); };
+    addEventListener('pointerdown', wake); addEventListener('keydown', wake);
+  }
 
   function update(dt) {
     const p = G.player;
@@ -465,7 +478,7 @@ const Game = (() => {
     if (G.touch) {
       const canAct = G.mode === 'play' && !UI.busy && G.lockN === 0 && !interBusy;
       const it = canAct && !G.player.path ? nearest() : null;
-      Pad.sync(canAct, it ? (it.label || 'use').toUpperCase() : null);
+      Pad.sync(canAct, it ? labelText(it.label || 'use').toLocaleUpperCase(LANG) : null);
     }
     updateRain(dt);
     Eggs.tick(dt);
@@ -620,7 +633,7 @@ const Game = (() => {
     else if (obj && obj.promptY != null) y = Math.round(obj.y + obj.promptY - cy);
     y += Math.round(Math.sin(G.t * 5) * 1);
     const key = G.touch ? '' : 'E';
-    const label = (it.label || '').toUpperCase();
+    const label = labelText(it.label || '').toLocaleUpperCase(LANG);
     const lw = textWidth(label);
     const w = (key ? 9 : 0) + lw + 6;
     const x0 = x - (w >> 1);
@@ -715,14 +728,14 @@ const Game = (() => {
     const x = G.player.x / s, y = G.player.y / s;
     g.fillStyle = C.ink; g.fillRect(x - 3, y - 3, 7, 7); g.fillStyle = C.r3; g.fillRect(x - 2, y - 2, 5, 5); g.fillStyle = C.white; g.fillRect(x - 1, y - 1, 2, 2);
     // labels
-    const L = document.querySelector('#map .labels');
-    L.innerHTML = '';
+    const lab = document.querySelector('#map .labels');
+    lab.innerHTML = '';
     for (const pl of TRAVEL) {
       const b = document.createElement('button');
       b.className = 'pin'; b.textContent = pl.name;
       b.style.left = (pl.x * TILE / G.ground.W * 100) + '%'; b.style.top = (pl.y * TILE / G.ground.H * 100) + '%';
       b.addEventListener('click', () => travel(pl));
-      L.appendChild(b);
+      lab.appendChild(b);
     }
   }
   async function travel(pl) {
@@ -733,11 +746,11 @@ const Game = (() => {
     G.player.x = Math.round(G.player.x); G.player.y = Math.round(G.player.y);
     G.cam.x = clamp(G.player.x - (G.vw >> 1), 0, MAP_W * TILE - G.vw); G.cam.y = clamp(G.player.y - 12 - (G.vh >> 1), 0, MAP_H * TILE - G.vh);
     await wait(0.15); await fade(false); unlock();
-    if (pl.x < 27 && !flag('trainHint')) { flag('trainHint', 1); UI.toast('Fast travel works. The <b>spike train</b> is more fun, though.'); }
+    if (pl.x < 27 && !flag('trainHint')) { flag('trainHint', 1); UI.toast(L('Fast travel works. The <b>spike train</b> is more fun, though.', 'Hızlı seyahat çalışıyor. Ama <b>spike treni</b> daha eğlenceli.')); }
   }
 
   const api = {
-    G, init, start, Person, building, prop, npc, entity, addObj, addInter, speaker, secret, flag, particle, burst, heart, bubble,
+    G, init, start, resume, Person, building, prop, npc, entity, addObj, addInter, speaker, secret, flag, particle, burst, heart, bubble,
     lock, unlock, wait, fade, walkTo, stamp, nearWater, groundAt, drawMap, travel, free, action,
     get player() { return G.player; }, get t() { return G.t; }, found: () => G.found,
     setTimeShift(h) { G.timeShift = h; }, get phase() { return G.phase || dayPhase(); },

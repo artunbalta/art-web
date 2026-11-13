@@ -44,7 +44,7 @@
     }
   }
 
-  const help = () => UI.custom({
+  const help = () => UI.custom(L({
     kicker: 'How this works', title: 'Walk. Poke. Repeat.', accent: 'teal',
     body: `<dl class="skills">
       <dt>Walk</dt><dd>WASD or arrow keys. Hold Shift to hurry. On a phone: tap where you want to go.</dd>
@@ -53,7 +53,63 @@
       <dt>In a rush?</dt><dd>The CV button gives you the boring, complete version.</dd>
     </dl>
     <p class="aside">There are ${Object.keys(SECRETS).length} secrets. Some are behind things, some are inside conversations, one is in a bottle.</p>`,
-  });
+  }, {
+    kicker: 'Nasıl oynanır', title: 'Yürü. Dürt. Tekrarla.', accent: 'teal',
+    body: `<dl class="skills">
+      <dt>Yürü</dt><dd>WASD ya da ok tuşları. Acelen varsa Shift’e basılı tut. Telefonda: gitmek istediğin yere dokun.</dd>
+      <dt>Etkileşim</dt><dd>Küçük bir etiket belirince E, Boşluk ya da Enter. Ya da o şeye dokunuver.</dd>
+      <dt>Harita</dt><dd>M: hızlı seyahat ve sır defterin.</dd>
+      <dt>Acelen mi var?</dt><dd>CV düğmesi sıkıcı ama eksiksiz hali veriyor.</dd>
+    </dl>
+    <p class="aside">Toplam ${Object.keys(SECRETS).length} sır var. Kimi bir şeylerin arkasında, kimi bir sohbetin içinde, biri de bir şişede.</p>`,
+  }));
+
+  // the static page text, in Turkish if that's the language (the Turkish sits next to the English in data-tr attributes)
+  if (LANG === 'tr') {
+    document.documentElement.lang = 'tr';
+    for (const e of document.querySelectorAll('[data-tr]')) e.innerHTML = e.dataset.tr;
+    for (const e of document.querySelectorAll('[data-tr-title]')) e.title = e.dataset.trTitle;
+    for (const e of document.querySelectorAll('[data-tr-aria]')) e.setAttribute('aria-label', e.dataset.trAria);
+  }
+
+  // the language switch: two flags, drawn a pixel at a time like everything else
+  const AY_YILDIZ = [   // the crescent and star, 24×16, # = white
+    '', '', '',
+    '.....###', '...####', '..###........#', '..##........####', '..##.......####', '..##.......####', '..##........####',
+    '..###........#', '...####', '.....###',
+  ];
+  function drawFlag(cv, kind) {
+    const W = 24, H = 16; cv.width = W; cv.height = H;
+    const g = cv.getContext('2d');
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      let col;
+      if (kind === 'tr') col = (AY_YILDIZ[y] || '')[x] === '#' ? '#fff' : '#e30a17';
+      else {
+        const u = x + 0.5, v = y + 0.5;
+        const d = Math.min(Math.abs(H * u - W * v), Math.abs(H * u + W * v - W * H)) / Math.hypot(W, H);
+        const cx = Math.abs(u - W / 2), cy = Math.abs(v - H / 2);
+        col = cx < 2 || cy < 2 ? '#c8102e' : cx < 3 || cy < 3 ? '#fff' : d < 0.45 ? '#c8102e' : d < 1.6 ? '#fff' : '#012169';
+      }
+      g.fillStyle = col; g.fillRect(x, y, 1, 1);
+    }
+  }
+  // picking the other language reloads the page in it (?lang=tr), and puts you back where you stood
+  function setLang(l) {
+    if (l === LANG) return;
+    try { if (Game.G.mode === 'play') sessionStorage.setItem('artun.resume', JSON.stringify({ x: Game.player.x, y: Game.player.y, dir: Game.player.dir, touch: !!Game.G.touch })); } catch (e) { /* no storage: the title screen it is */ }
+    const u = new URL(location.href);
+    if (l === 'tr') u.searchParams.set('lang', 'tr'); else u.searchParams.delete('lang');
+    location.replace(u.href);
+  }
+  const langBox = $('#lang');
+  for (const b of langBox.querySelectorAll('button')) {
+    drawFlag(b.querySelector('canvas'), b.dataset.lang);
+    b.classList.toggle('on', b.dataset.lang === LANG);
+    b.setAttribute('aria-pressed', String(b.dataset.lang === LANG));
+    b.addEventListener('click', () => setLang(b.dataset.lang));
+  }
+  // the HUD sits just left of the flags
+  const fitLang = () => document.documentElement.style.setProperty('--langw', langBox.offsetWidth + 'px');
 
   drawLogo();
   // blow the logo up by a whole number of device pixels, so every pixel is the same size (no shimmer)
@@ -64,12 +120,19 @@
     L.style.setProperty('--lp', (k / dpr) + 'px');
   }
   fitLogo(); addEventListener('resize', fitLogo);
+  fitLang(); addEventListener('resize', fitLang);
   // show the title text only once its fonts are in, so nothing jumps when they arrive
   const ready = () => document.body.classList.add('ready');
   addEventListener('load', () => (document.fonts ? document.fonts.ready : Promise.resolve()).then(ready));
   setTimeout(ready, 2000);
   UI.init();
   Game.init();
+  // back from a language switch?
+  try {
+    const st = JSON.parse(sessionStorage.getItem('artun.resume') || 'null');
+    sessionStorage.removeItem('artun.resume');
+    if (st) Game.resume(st);
+  } catch (e) { /* fine: the title screen */ }
 
   $('#title').addEventListener('pointerdown', e => { if (!e.target.closest('button')) { SFX.unlock(); Game.start(); } });
   $('[data-enter]').addEventListener('click', () => { SFX.unlock(); Game.start(); });
@@ -81,5 +144,6 @@
   $('[data-help]').addEventListener('click', help);
 
   console.log('%c ARTUN BALTA ', 'background:#22467d;color:#fadb74;font:bold 18px monospace;padding:4px 10px;border:2px solid #2b2135',
-    '\nYou opened the console. We’re going to get along.\nEvery pixel here is drawn by code — there isn’t a single image file in this site.\nTry typing “hire” while you walk around. Or ↑ ↑ ↓ ↓ ← → ← → B A.');
+    L('\nYou opened the console. We’re going to get along.\nEvery pixel here is drawn by code — there isn’t a single image file in this site.\nTry typing “hire” while you walk around. Or ↑ ↑ ↓ ↓ ← → ← → B A.',
+      '\nKonsolu açtın. Seninle iyi anlaşacağız.\nBuradaki her piksel kodla çizildi; sitede tek bir görsel dosyası yok.\nGezinirken “hire” yazmayı dene. Ya da ↑ ↑ ↓ ↓ ← → ← → B A.'));
 })();

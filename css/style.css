@@ -66,6 +66,20 @@ body.playing #zone, body.playing #hud { opacity: 1; pointer-events: auto; }
 #hud .snd.off .w { display: none; }
 #hud .snd.off { color: var(--paper3); }
 
+/* ---------- language: two pixel flags, top right, on the title and in the world ---------- */
+#lang { position: fixed; top: 12px; right: 12px; z-index: 31; display: flex; height: 38px; background: var(--paper); border: 3px solid var(--ink); clip-path: var(--notch); box-shadow: inset -3px -3px 0 var(--paper3), inset 3px 3px 0 #fff; padding: 0 3px; }
+body.playing #lang { z-index: 10; }
+/* Silkscreen has no Ş, Ğ or İ: in Turkish the labels use Pixelify, set in capitals (lang="tr" turns i into İ) */
+html[lang="tr"] { --label: 'Pixelify Sans', ui-monospace, monospace; }
+html[lang="tr"] :is(.btn, #title .sub, #zone, #hud button, #dlg .name, .card .kicker, #map .kicker, .card footer, .meta, .facts b, .skills dt, .react, .bar span, .pin, .journal h3, #cv dt, #pad .b) { text-transform: uppercase; letter-spacing: .04em; }
+html[lang="tr"] .cast .you::after { content: 'sen'; text-transform: uppercase; }
+body.playing #hud { right: calc(18px + var(--langw, 70px)); }   /* --langw: measured by main.js */
+#lang button { background: none; border: 0; padding: 0 4px; display: grid; place-items: center; }
+#lang canvas { width: 24px; height: 16px; image-rendering: pixelated; image-rendering: crisp-edges; outline: 2px solid var(--ink); opacity: .38; filter: saturate(.35); transition: opacity .15s, filter .15s; }
+#lang button:hover canvas { opacity: .8; filter: none; }
+#lang button.on canvas { opacity: 1; filter: none; }
+#lang button.on { cursor: default; }
+
 /* ---------- toast ---------- */
 /* parked just above the screen (and hidden) when off, so no sliver of it ever peeks in */
 #toast { --toast-y: 62px; position: fixed; top: 0; left: 50%; transform: translate(-50%, -100%); visibility: hidden; z-index: 25; background: var(--paper); border: 3px solid var(--ink); clip-path: var(--notch); padding: 9px 14px 8px; font-size: 15px; max-width: min(92vw, 520px); text-align: center; transition: transform .35s steps(5), visibility 0s .35s; pointer-events: none; box-shadow: inset -3px -3px 0 var(--paper2); }
@@ -234,6 +248,8 @@ body.touch.playing #pad.hide { display: none; }
   #zone { font-size: 10px; padding: 7px 9px 6px; max-width: 46vw; }
   #hud { gap: 4px; } #hud button { height: 34px; min-width: 32px; padding: 0 7px; font-size: 10px; }
   #hud [data-help] { display: none; }
+  /* no room beside the HUD on a phone: the flags drop just below it once you're in */
+  #lang { height: 34px; padding: 0 1px; } body.playing #hud { right: 12px; } body.playing #lang { top: 52px; }
   #dlg { padding: 12px 12px 14px; grid-template-columns: 1fr; }
   #dlg .portrait { display: none !important; }
   #dlg .text { font-size: 16.5px; } #dlg .choices { grid-column: 1; } #dlg .choice { font-size: 16px; }

@@ -15,28 +15,28 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<canvas id="game" role="img" aria-label="A small pixel-art world: Ankara, İstanbul and London, connected by a train. Use the CV button for a plain-text version."></canvas>
+<canvas id="game" role="img" aria-label="A small pixel-art world: Ankara, İstanbul and London, connected by a train. Use the CV button for a plain-text version." data-tr-aria="Küçük bir piksel dünya: Ankara, İstanbul ve Londra, bir trenle birbirine bağlı. Düz metin hali için CV düğmesini kullan."></canvas>
 
 <!-- title -->
-<section id="title" aria-label="Title screen">
+<section id="title" aria-label="Title screen" data-tr-aria="Giriş ekranı">
   <div class="logo-wrap"><canvas id="logo" width="10" height="10" aria-hidden="true"></canvas><h1 class="sr">Artun Balta</h1></div>
-  <p class="sub">engineer · decodes brains · co-founded a voice-AI company</p>
-  <p class="press"><span class="k">press any key</span><span class="t">tap anywhere</span> to walk in</p>
+  <p class="sub" data-tr="mühendis · beyin okur · sesli yapay zekâ şirketinin kurucu ortağı">engineer · decodes brains · co-founded a voice-AI company</p>
+  <p class="press" data-tr='içeri girmek için <span class="k">bir tuşa bas</span><span class="t">ekrana dokun</span>'><span class="k">press any key</span><span class="t">tap anywhere</span> to walk in</p>
   <div class="title-actions">
-    <button class="btn" data-enter>Enter the world ▸</button>
-    <button class="btn ghost" data-cv>Just the CV, please</button>
+    <button class="btn" data-enter data-tr="Dünyaya gir ▸">Enter the world ▸</button>
+    <button class="btn ghost" data-cv data-tr="Sadece CV, lütfen">Just the CV, please</button>
   </div>
-  <p class="hint">Ankara → İstanbul → London. Some assembly required.</p>
+  <p class="hint" data-tr="Ankara → İstanbul → Londra. Biraz montaj gerektirir.">Ankara → İstanbul → London. Some assembly required.</p>
 </section>
 
 <!-- HUD -->
-<div id="zone" aria-live="polite"><i></i><span class="zn">Ankara · Home</span></div>
-<nav id="hud" aria-label="Menu">
-  <button class="secrets" data-journal title="Secrets found (opens the map)"><span>✦</span><b>0/0</b></button>
-  <button data-map title="Map & fast travel (M)">MAP</button>
-  <button data-cvbtn title="The plain CV">CV</button>
-  <button class="snd" data-snd title="Sound on/off" aria-label="Toggle sound"><svg viewBox="0 0 9 8" width="18" height="16" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 3h2V2h1V1h1V0h1v8H4V7H3V6H2V5H0z" fill="currentColor"/><path class="w" d="M6 2h1v1h1v2H7v1H6V5h1V3H6z" fill="currentColor"/></svg></button>
-  <button data-help title="How to play">?</button>
+<div id="zone" aria-live="polite"><i></i><span class="zn" data-tr="Ankara · Ev">Ankara · Home</span></div>
+<nav id="hud" aria-label="Menu" data-tr-aria="Menü">
+  <button class="secrets" data-journal title="Secrets found (opens the map)" data-tr-title="Bulunan sırlar (haritayı açar)"><span>✦</span><b>0/0</b></button>
+  <button data-map title="Map &amp; fast travel (M)" data-tr-title="Harita ve hızlı seyahat (M)" data-tr="HARİTA">MAP</button>
+  <button data-cvbtn title="The plain CV" data-tr-title="Sade CV">CV</button>
+  <button class="snd" data-snd title="Sound on/off" aria-label="Toggle sound" data-tr-title="Ses açık/kapalı" data-tr-aria="Sesi aç/kapat"><svg viewBox="0 0 9 8" width="18" height="16" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 3h2V2h1V1h1V0h1v8H4V7H3V6H2V5H0z" fill="currentColor"/><path class="w" d="M6 2h1v1h1v2H7v1H6V5h1V3H6z" fill="currentColor"/></svg></button>
+  <button data-help title="How to play" data-tr-title="Nasıl oynanır">?</button>
 </nav>
 <div id="toast" role="status" aria-live="polite"></div>
 
@@ -52,26 +52,26 @@
 <!-- info panel -->
 <div id="panel" role="dialog" aria-modal="true">
   <article class="card" data-accent="teal">
-    <header><span class="kicker"></span><button class="x" aria-label="Close">✕</button></header>
+    <header><span class="kicker"></span><button class="x" aria-label="Close" data-tr-aria="Kapat">✕</button></header>
     <h2 class="title"></h2>
     <div class="body"></div>
-    <footer><span class="esc">esc</span> to close</footer>
+    <footer data-tr='kapatmak için <span class="esc">esc</span>'><span class="esc">esc</span> to close</footer>
   </article>
 </div>
 
 <!-- map + journal -->
-<div id="map" role="dialog" aria-modal="true" aria-label="Map">
+<div id="map" role="dialog" aria-modal="true" aria-label="Map" data-tr-aria="Harita">
   <div class="sheet">
-    <header><span class="kicker">The map</span><button class="x" aria-label="Close">✕</button></header>
+    <header><span class="kicker" data-tr="Harita">The map</span><button class="x" aria-label="Close" data-tr-aria="Kapat">✕</button></header>
     <div class="mapwrap"><canvas></canvas><div class="labels"></div></div>
-    <p class="mapnote">Tap a name to fast-travel. (The train is more fun.)</p>
-    <div class="journal"><h3>Secrets <b>0/0</b></h3><ul></ul></div>
+    <p class="mapnote" data-tr="Hızlı seyahat için bir isme dokun. (Tren daha eğlenceli.)">Tap a name to fast-travel. (The train is more fun.)</p>
+    <div class="journal"><h3 data-tr="Sırlar <b>0/0</b>">Secrets <b>0/0</b></h3><ul></ul></div>
   </div>
 </div>
 
 <!-- recruiter mode -->
-<div id="cv" role="dialog" aria-modal="true" aria-label="Curriculum vitae">
-  <button class="x" aria-label="Back to the world">✕</button>
+<div id="cv" role="dialog" aria-modal="true" aria-label="Curriculum vitae" data-tr-aria="Özgeçmiş">
+  <button class="x" aria-label="Back to the world" data-tr-aria="Dünyaya dön">✕</button>
   <div class="doc"></div>
 </div>
 
@@ -79,9 +79,15 @@
 <div id="pad" class="hide" aria-hidden="true">
   <div class="joy"><div class="base"></div><div class="knob"></div></div>
   <div class="btns">
-    <button class="b" data-run tabindex="-1"><span>RUN</span></button>
+    <button class="b" data-run tabindex="-1"><span data-tr="KOŞ">RUN</span></button>
     <button class="a idle" data-act tabindex="-1"><span class="k">A</span><span class="l"></span></button>
   </div>
+</div>
+
+<!-- language: English by default; a flag switches -->
+<div id="lang" role="group" aria-label="Language" data-tr-aria="Dil">
+  <button data-lang="en" title="English" aria-label="English"><canvas width="1" height="1"></canvas></button>
+  <button data-lang="tr" title="Türkçe" aria-label="Türkçe"><canvas width="1" height="1"></canvas></button>
 </div>
 
 <div id="fade"></div>

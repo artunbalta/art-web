@@ -23,55 +23,63 @@ const Eggs = (() => {
   /* ================= people ================= */
   E.intro = async () => {
     const back = Game.flag('met');
-    UI.toast(Game.G.touch ? 'Joystick to walk · <b>A</b> to interact · or just tap where you want to go' : '<b>WASD</b> / arrows to walk · <b>E</b> to interact · <b>M</b> for the map', 6500);
-    if (!back) setTimeout(() => Game.bubble(E.artunEnt, 'HEY! OVER HERE!', 3500), 900);
-    else setTimeout(() => UI.toast(`Welcome back. <b>✦ ${Game.found().size}/${total()}</b> secrets so far.`), 7000);
+    UI.toast(Game.G.touch ? L('Joystick to walk · <b>A</b> to interact · or just tap where you want to go', 'Yürümek için joystick · etkileşim için <b>A</b> · ya da gitmek istediğin yere dokun') : L('<b>WASD</b> / arrows to walk · <b>E</b> to interact · <b>M</b> for the map', '<b>WASD</b> / ok tuşlarıyla yürü · <b>E</b> ile etkileşim · <b>M</b> ile harita'), 6500);
+    if (!back) setTimeout(() => Game.bubble(E.artunEnt, L('HEY! OVER HERE!', 'HEY! BURAYA!'), 3500), 900);
+    else setTimeout(() => UI.toast(L(`Welcome back. <b>✦ ${Game.found().size}/${total()}</b> secrets so far.`, `Tekrar hoş geldin. Şu ana kadar <b>✦ ${Game.found().size}/${total()}</b> sır.`)), 7000);
   };
   E.artun = async () => {
     const s = SP.artun;
     if (!Game.flag('met')) {
       Game.flag('met', 1);
-      await say(s, ['Oh — a visitor! Hi. I’m Artun.', 'This is my little world. Everything in it is something I’ve done… or something I would absolutely do.', 'Walk around. Poke things. Most things poke back.',
-        `In a hurry? There’s a CV button up top. Not in a hurry? There are ${total()} secrets hidden around here. No pressure. (Some pressure.)`]);
+      await say(s, L(['Oh — a visitor! Hi. I’m Artun.', 'This is my little world. Everything in it is something I’ve done… or something I would absolutely do.', 'Walk around. Poke things. Most things poke back.',
+        `In a hurry? There’s a CV button up top. Not in a hurry? There are ${total()} secrets hidden around here. No pressure. (Some pressure.)`],
+        ['Aa — bir misafir! Selam, ben Artun.', 'Burası benim küçük dünyam. İçindeki her şey ya yaptığım bir şey… ya da kesinlikle yapacağım bir şey.', 'Gez, dolaş. Bir şeyleri dürt. Çoğu seni geri dürter.',
+        `Acelen mi var? Yukarıda bir CV butonu var. Acelen yok mu? Buralarda saklı ${total()} sır var. Baskı yok. (Biraz baskı var.)`]));
     }
-    const c = await choose(s, pick(['Need anything?', 'Hm?', 'What’s up?']), ['Who are you, really?', 'What are you working on?', 'Give me a hint', 'Bye!']);
-    if (c === 0) await say(s, ['An electrical engineer who wandered into neuroscience and never found the exit.', 'I decode signals from brains — EEG, ECoG, single neurons — and build machine learning for data that’s noisy on purpose.', 'On the side, I co-founded volina. — voice agents that call people back. Politely.']);
-    else if (c === 1) await say(s, ['An MRes in Neurotechnology at Imperial: auditory attention decoding. Which voice is a brain listening to — one neuron at a time.', 'And for fun: echo, an open world that learns who you are from how you play. There’s a doorway to it at the bottom of the Lab Garden.', 'Take the Spike Train from İstanbul and I’ll show you London. I’ll meet you there. Don’t ask how.']);
+    const c = await choose(s, pick(L(['Need anything?', 'Hm?', 'What’s up?'], ['Bir şey lazım mı?', 'Hm?', 'Naber?'])), L(['Who are you, really?', 'What are you working on?', 'Give me a hint', 'Bye!'], ['Sen aslında kimsin?', 'Neler üzerinde çalışıyorsun?', 'Bir ipucu ver', 'Görüşürüz!']));
+    if (c === 0) await say(s, L(['An electrical engineer who wandered into neuroscience and never found the exit.', 'I decode signals from brains — EEG, ECoG, single neurons — and build machine learning for data that’s noisy on purpose.', 'On the side, I co-founded volina. — voice agents that call people back. Politely.'],
+      ['Yolu nörobilime düşmüş ve bir daha çıkışı bulamamış bir elektrik mühendisi.', 'Beyinlerden gelen sinyalleri çözüyorum — EEG, ECoG, tek tek nöronlar — ve sanki inadına gürültülü olan veriler için makine öğrenmesi geliştiriyorum.', 'Bir de yan tarafta volina.’nın kurucu ortağıyım — insanları geri arayan sesli asistanlar. Kibarca.']));
+    else if (c === 1) await say(s, L(['An MRes in Neurotechnology at Imperial: auditory attention decoding. Which voice is a brain listening to — one neuron at a time.', 'And for fun: echo, an open world that learns who you are from how you play. There’s a doorway to it at the bottom of the Lab Garden.', 'Take the Spike Train from İstanbul and I’ll show you London. I’ll meet you there. Don’t ask how.'],
+      ['Imperial’da Nöroteknoloji MRes’i: işitsel dikkat çözümleme. Beyin hangi sesi dinliyor — tek tek nöronlarla.', 'Bir de keyif için: echo, nasıl oynadığından kim olduğunu öğrenen bir açık dünya. Kapısı Lab Bahçesi’nin en altında.', 'İstanbul’dan Spike Treni’ne bin, sana Londra’yı göstereyim. Orada buluşuruz. Nasıl diye sorma.']));
     else if (c === 2) await say(s, [nextHint()]);
-    else await say(s, ['Have fun. Mind the Tesla coil.']);
+    else await say(s, L(['Have fun. Mind the Tesla coil.'], ['İyi eğlenceler. Tesla bobinine dikkat et.']));
   };
   let hintI = store.get('hintI', 0);
   function nextHint() { const h = HINTS[hintI % HINTS.length]; hintI++; store.set('hintI', hintI); return h; }
   E.artunIst = async () => {
-    await say(SP.artun, ['Of course I’m at the tea garden. Where else would I be?', 'Boğaziçi is up the hill — I did EEG workload research at MIMLAB. There’s a test at the terminal. It’s humbling.']);
+    await say(SP.artun, L(['Of course I’m at the tea garden. Where else would I be?', 'Boğaziçi is up the hill — I did EEG workload research at MIMLAB. There’s a test at the terminal. It’s humbling.'],
+      ['Tabii ki çay bahçesindeyim. Başka nerede olacaktım?', 'Boğaziçi yokuşun yukarısında — MIMLAB’de EEG ile zihinsel iş yükü araştırması yaptım. Terminalde bir test var. İnsana haddini bildiriyor.']));
   };
   E.artunLon = async () => {
-    if (!Game.flag('lonMet')) { Game.flag('lonMet', 1); await say(SP.artun, ['How did I get here before you? I took an earlier spike.', 'Neurons do it all the time.']); }
-    const c = await choose(SP.artun, 'Welcome to South Kensington. It’s raining. It’s always raining.', ['What’s the thesis, simply?', 'How’s London?', 'Bye']);
-    if (c === 0) await say(SP.artun, ['At a party, your brain locks onto one voice and turns the rest into soup.', 'Deep-network models called dSTRFs describe what auditory neurons “listen for” — so far, mostly from population recordings like ECoG.', 'I adapt them to single neurons: spike trains, Poisson likelihoods, lots of silence. Then ask what attention does to them.', 'Go stand next to someone at the party on the lawn. You’ll get it.']);
-    else if (c === 1) await say(SP.artun, ['Great museums, great comedy, terrible tea.', 'They put milk in it. On purpose.']);
+    if (!Game.flag('lonMet')) { Game.flag('lonMet', 1); await say(SP.artun, L(['How did I get here before you? I took an earlier spike.', 'Neurons do it all the time.'], ['Senden önce nasıl mı geldim? Bir önceki spike’a bindim.', 'Nöronlar bunu hep yapar.'])); }
+    const c = await choose(SP.artun, L('Welcome to South Kensington. It’s raining. It’s always raining.', 'South Kensington’a hoş geldin. Yağmur yağıyor. Hep yağmur yağıyor.'), L(['What’s the thesis, simply?', 'How’s London?', 'Bye'], ['Tezin ne, kısaca?', 'Londra nasıl?', 'Hoşça kal']));
+    if (c === 0) await say(SP.artun, L(['At a party, your brain locks onto one voice and turns the rest into soup.', 'Deep-network models called dSTRFs describe what auditory neurons “listen for” — so far, mostly from population recordings like ECoG.', 'I adapt them to single neurons: spike trains, Poisson likelihoods, lots of silence. Then ask what attention does to them.', 'Go stand next to someone at the party on the lawn. You’ll get it.'],
+      ['Bir partide beynin tek bir sese kilitlenir, gerisini çorbaya çevirir.', 'dSTRF denen derin ağ modelleri, işitsel nöronların neye “kulak kabarttığını” anlatıyor — şimdiye kadar çoğunlukla ECoG gibi popülasyon kayıtlarından.', 'Ben onları tek nöronlara uyarlıyorum: spike dizileri, Poisson olabilirlikleri, bolca sessizlik. Sonra dikkatin onlara ne yaptığını soruyorum.', 'Git, çimdeki partide birinin yanında dur. Anlarsın.']));
+    else if (c === 1) await say(SP.artun, L(['Great museums, great comedy, terrible tea.', 'They put milk in it. On purpose.'], ['Müzeler harika, komedi harika, çay berbat.', 'İçine süt koyuyorlar. Bile bile.']));
   };
   E.teyze = async () => {
     const n = (Game.flag('teyzeN') || 0) + 1; Game.flag('teyzeN', n);
-    if (n === 1) await say(SP.teyze, ['Ay, hoş geldin! You’re Artun’s friend? Such a polite boy. Always fixing my radio.', 'Now he’s in London, fixing brains. Brains!', 'I told him: son, just call your mother. That’s the neuron she wants decoded.']);
-    else if (n === 2) await say(SP.teyze, ['Did you eat? You look thin.', 'They don’t have proper bread in London, you know. I checked. On the internet.']);
+    if (n === 1) await say(SP.teyze, L(['Ay, hoş geldin! You’re Artun’s friend? Such a polite boy. Always fixing my radio.', 'Now he’s in London, fixing brains. Brains!', 'I told him: son, just call your mother. That’s the neuron she wants decoded.'],
+      ['Ay, hoş geldin! Artun’un arkadaşı mısın? Ne kibar çocuktur. Radyomu hep o tamir ederdi.', 'Şimdi Londra’da beyin tamir ediyormuş. Beyin!', 'Dedim ki: oğlum, önce bir anneni ara. Annenin senden çözmeni beklediği tek sinyal o.']));
+    else if (n === 2) await say(SP.teyze, L(['Did you eat? You look thin.', 'They don’t have proper bread in London, you know. I checked. On the internet.'], ['Yemek yedin mi? Zayıf görünüyorsun.', 'Londra’da doğru dürüst ekmek yokmuş, biliyor musun? Baktım. İnternetten.']));
     else {
-      await say(SP.teyze, ['Here. Take this. Don’t argue.']);
+      await say(SP.teyze, L(['Here. Take this. Don’t argue.'], ['Al şunu. İtiraz istemem.']));
       P().carry = ICON.borek; P().carryKind = 'börek';
-      await say(NAR, ['(You received a börek. It is still warm. It will always be warm.)']);
+      await say(NAR, L(['(You received a börek. It is still warm. It will always be warm.)'], ['(Bir börek aldın. Hâlâ sıcak. Hep sıcak kalacak.)']));
       secret('teyze');
     }
   };
   E.student = async (it) => {
-    if (it.ent.name === 'Ece') await say(SP.ece, ['Is this going to be on the exam?', '…Our TA used to say “gravity is on every exam. You’re taking it right now.” I still don’t know if that was a joke.']);
-    else await say(SP.mert, ['PHYS102 lab report due Friday. I measured g as 11.2.', 'The TA wrote “bold” in the margin. Just “bold”.']);
+    if (it.ent.name === 'Ece') await say(SP.ece, L(['Is this going to be on the exam?', '…Our TA used to say “gravity is on every exam. You’re taking it right now.” I still don’t know if that was a joke.'], ['Bu sınavda çıkar mı?', '…Asistanımız “yerçekimi her sınavda çıkar; şu an da onun sınavındasın” derdi. Hâlâ şaka mıydı bilmiyorum.']));
+    else await say(SP.mert, L(['PHYS102 lab report due Friday. I measured g as 11.2.', 'The TA wrote “bold” in the margin. Just “bold”.'], ['PHYS102 lab raporu cuma teslim. g’yi 11,2 ölçtüm.', 'Asistan kenara “cesur” yazmış. Sadece “cesur”.']));
   };
   // the boom stays down until you've had a word with the guard. Permission lasts one visit ("five minutes").
   let gateOpen = false, gateT = 0;
   E.guard = async () => {
-    if (gateOpen) return say(SP.guard, ['The radar sees things you haven’t found yet. That’s the whole point of radar.']);
-    if (Game.flag('radarOk')) await say(SP.guard, ['Restricted area.', '…Oh, it’s you again. Same deal as last time: five minutes, and not a word to the radar.']);
-    else await say(SP.guard, ['Restricted area.', '…', 'You know Artun? He interned here in summer 2024. Kept saying “constant false alarm rate” at lunch.', 'Fine. You can use the radar in the yard. Five minutes. Don’t tell anyone. Especially not the radar.']);
+    if (gateOpen) return say(SP.guard, L(['The radar sees things you haven’t found yet. That’s the whole point of radar.'], ['Radar senin henüz bulamadığın şeyleri görür. Radarın olayı zaten bu.']));
+    if (Game.flag('radarOk')) await say(SP.guard, L(['Restricted area.', '…Oh, it’s you again. Same deal as last time: five minutes, and not a word to the radar.'], ['Burası yasak bölge.', '…Aa, yine sen. Geçen seferki anlaşma geçerli: beş dakika, radara da tek kelime yok.']));
+    else await say(SP.guard, L(['Restricted area.', '…', 'You know Artun? He interned here in summer 2024. Kept saying “constant false alarm rate” at lunch.', 'Fine. You can use the radar in the yard. Five minutes. Don’t tell anyone. Especially not the radar.'],
+      ['Burası yasak bölge.', '…', 'Artun’u tanıyor musun? 2024 yazında burada staj yaptı. Öğle yemeklerinde durmadan “sabit yanlış alarm oranı” derdi.', 'Peki. Bahçedeki radarı kullanabilirsin. Beş dakika. Kimseye söyleme. Özellikle de radara.']));
     Game.flag('radarOk', 1); openGate();
   };
   function openGate() {
@@ -96,80 +104,80 @@ const Eggs = (() => {
     px(g, x + 1, y - 13, C.t0);
   };
   E.prof = async () => {
-    await say(SP.prof, ['Looking for Artun? Probably fitting a Poisson model.', 'Or out on the lawn “doing fieldwork” at the cocktail party. Fieldwork. Honestly.']);
+    await say(SP.prof, L(['Looking for Artun? Probably fitting a Poisson model.', 'Or out on the lawn “doing fieldwork” at the cocktail party. Fieldwork. Honestly.'], ['Artun’u mu arıyorsun? Muhtemelen bir Poisson modeli oturtuyordur.', 'Ya da dışarıda, çimdeki kokteyl partisinde “saha çalışması” yapıyordur. Saha çalışması. Pes yani.']));
   };
   E.watchmaker = async () => {
-    const c = await choose(SP.watch, 'Escapement & Sons. Est. 1761. We don’t sell watches; we let you look at them.', ['Why do they all say 10:10?', 'Is a mechanical watch accurate?', 'Can I buy one?']);
-    if (c === 0) { await say(SP.watch, ['Advertising. The hands frame the logo like a smile.', 'Your friend Artun sets his to the real time. Checks it daily. Against an atomic clock. We are a little afraid of him.']); secret('tenten'); }
-    else if (c === 1) await say(SP.watch, ['A balance wheel beating 28,800 times an hour. Plus or minus a few seconds a day.', 'Your phone is more accurate. That is not the point. Nothing about this is the point.']);
-    else await say(SP.watch, ['No.', '(He says it kindly.)']);
+    const c = await choose(SP.watch, L('Escapement & Sons. Est. 1761. We don’t sell watches; we let you look at them.', 'Escapement & Sons. Kuruluş 1761. Saat satmayız; bakmana izin veririz.'), L(['Why do they all say 10:10?', 'Is a mechanical watch accurate?', 'Can I buy one?'], ['Neden hepsi 10:10’u gösteriyor?', 'Mekanik saat doğru çalışır mı?', 'Bir tane alabilir miyim?']));
+    if (c === 0) { await say(SP.watch, L(['Advertising. The hands frame the logo like a smile.', 'Your friend Artun sets his to the real time. Checks it daily. Against an atomic clock. We are a little afraid of him.'], ['Reklam. Akrep ile yelkovan logoyu bir gülümseme gibi çerçeveler.', 'Arkadaşın Artun kendininkini gerçek saate ayarlar. Her gün kontrol eder. Atom saatine göre. Ondan biraz korkuyoruz.'])); secret('tenten'); }
+    else if (c === 1) await say(SP.watch, L(['A balance wheel beating 28,800 times an hour. Plus or minus a few seconds a day.', 'Your phone is more accurate. That is not the point. Nothing about this is the point.'], ['Saatte 28.800 kez atan bir balans çarkı. Günde artı eksi birkaç saniye.', 'Telefonun daha doğru. Mesele o değil. Burada hiçbir şeyin meselesi o değil.']));
+    else await say(SP.watch, L(['No.', '(He says it kindly.)'], ['Hayır.', '(Bunu nazikçe söylüyor.)']));
   };
 
   /* ================= Ankara ================= */
   E.home = async () => {
     const k = (Game.flag('knocks') || 0) + 1; Game.flag('knocks', k);
-    if (k === 1) { SFX.thud(); await say(NAR, ['*knock knock*', '(Nobody answers. Artun is standing right behind you, waving.)']); }
+    if (k === 1) { SFX.thud(); await say(NAR, L(['*knock knock*', '(Nobody answers. Artun is standing right behind you, waving.)'], ['*tak tak*', '(Kimse açmıyor. Artun tam arkanda durmuş, el sallıyor.)'])); }
     await UI.panel('home');
   };
   E.shed = () => UI.panel('skills');
   E.mirror = async () => {
-    const c = await choose(NAR, 'A standing mirror. You look… like a visitor. A good one, honestly.', ['Try a new look', 'I’m perfect as I am']);
-    if (c) { await say(NAR, ['Correct.']); return; }
+    const c = await choose(NAR, L('A standing mirror. You look… like a visitor. A good one, honestly.', 'Bir boy aynası. Şöyle görünüyorsun… bir misafir gibi. İyi bir misafir, açıkçası.'), L(['Try a new look', 'I’m perfect as I am'], ['Yeni bir tarz dene', 'Ben böyle mükemmelim']));
+    if (c) { await say(NAR, L(['Correct.'], ['Doğru.'])); return; }
     const seed = (Math.random() * 1e9) | 0; store.set('lookSeed', seed);
     P().setLook(randomLook(seed)); SFX.pop(); Game.burst(P().x, P().y - 12, 10, [C.white, C.y3, C.p2], 30);
-    await say(NAR, ['Fresh look. Same you.']);
+    await say(NAR, L(['Fresh look. Same you.'], ['Yeni tarz. Aynı sen.']));
   };
   E.mailbox = async () => { Game.flag('mailRead', 1); await UI.panel('contact'); };
   E.balta = async () => {
-    const c = await choose(NAR, 'An axe, stuck in a stump. A tiny brass plate on the handle says: BALTA.', ['Pull it out', 'Leave it']);
+    const c = await choose(NAR, L('An axe, stuck in a stump. A tiny brass plate on the handle says: BALTA.', 'Bir kütüğe saplanmış bir balta. Sapındaki minik pirinç plakada şu yazıyor: BALTA.'), L(['Pull it out', 'Leave it'], ['Çekip çıkar', 'Bırak kalsın']));
     if (c) return;
     SFX.thud(); Game.G.shake = 3;
-    await say(NAR, ['You pull with everything you’ve got.', 'It doesn’t move. Not even a little.', '(“Balta” is Turkish for “axe”. It’s also Artun’s surname. The family has been stuck here for generations.)']);
+    await say(NAR, L(['You pull with everything you’ve got.', 'It doesn’t move. Not even a little.', '(“Balta” is Turkish for “axe”. It’s also Artun’s surname. The family has been stuck here for generations.)'], ['Var gücünle çekiyorsun.', 'Kımıldamıyor. Azıcık bile.', '(Artun’un soyadı Balta. Aile nesillerdir buraya saplanıp kalmış.)']));
     secret('balta');
   };
   E.fountain = async () => {
-    const c = await choose(NAR, 'A fountain. Coins at the bottom, and one suspiciously shiny lira.', ['Toss a coin', 'Just listen']);
+    const c = await choose(NAR, L('A fountain. Coins at the bottom, and one suspiciously shiny lira.', 'Bir havuz. Dibinde bozuk paralar, bir de şüpheli derecede parlak bir lira.'), L(['Toss a coin', 'Just listen'], ['Bozuk para at', 'Sadece dinle']));
     if (c === 0) {
       SFX.coin(); setTimeout(() => SFX.splash(), 250);
       Game.burst(73.5 * 16, 28 * 16, 10, [C.w5, C.white], 30);
-      await say(NAR, [pick(['Plink. Your wish has been logged. Expected delivery: 6–8 business years.', 'Plink. The fountain thinks about it. The fountain says “maybe”.', 'Plink. Somewhere, a PhD application gets very slightly better.'])]);
-    } else await say(NAR, ['It sounds like white noise. Artun would like you to know that white noise has a flat power spectral density.', 'Artun is not invited to many parties. (He is invited to one. It’s in London.)']);
+      await say(NAR, [pick(L(['Plink. Your wish has been logged. Expected delivery: 6–8 business years.', 'Plink. The fountain thinks about it. The fountain says “maybe”.', 'Plink. Somewhere, a PhD application gets very slightly better.'], ['Şıp. Dileğin kaydedildi. Tahmini teslimat: 6–8 iş yılı.', 'Şıp. Havuz biraz düşünüyor. Havuz “belki” diyor.', 'Şıp. Bir yerlerde bir doktora başvurusu azıcık daha iyi oluyor.']))]);
+    } else await say(NAR, L(['It sounds like white noise. Artun would like you to know that white noise has a flat power spectral density.', 'Artun is not invited to many parties. (He is invited to one. It’s in London.)'], ['Beyaz gürültü gibi bir ses. Artun, beyaz gürültünün güç spektral yoğunluğunun düz olduğunu bilmeni istiyor.', 'Artun pek partiye çağrılmaz. (Bir tanesine çağrıldı. Londra’da.)']));
   };
   E.bench = async () => {
-    const c = await choose(NAR, 'A sunny bench. The kind where you sit for five minutes and lose four hours.', ['Sit down', 'Not now']);
+    const c = await choose(NAR, L('A sunny bench. The kind where you sit for five minutes and lose four hours.', 'Güneşli bir bank. Beş dakikalığına oturup dört saat kaybettiğin türden.'), L(['Sit down', 'Not now'], ['Otur', 'Şimdi değil']));
     if (c) return;
     UI.endDlg(); Game.lock(); await Game.fade(true);
     Game.setTimeShift((Game.G.timeShift + 7) % 24);
     await Game.wait(0.7); await Game.fade(false); Game.unlock();
-    await say(NAR, [Game.phase.dark > 0.3 ? 'You sat down for “five minutes”. It’s night now. The lamps came on without asking.' : 'You sat down for “five minutes”. The light has changed. So have you, a little.']);
+    await say(NAR, [Game.phase.dark > 0.3 ? L('You sat down for “five minutes”. It’s night now. The lamps came on without asking.', '“Beş dakikalığına” oturdun. Gece olmuş. Lambalar kimseye sormadan yanmış.') : L('You sat down for “five minutes”. The light has changed. So have you, a little.', '“Beş dakikalığına” oturdun. Işık değişti. Sen de biraz değiştin.')]);
     secret('bench');
   };
-  E.welcome = () => say(NAR, ['HOŞ GELDİN — welcome to Baltaköy. Population: 1 (+ you).', '(“Köy” means village. “Balta” means axe. The axe is around here somewhere.)']);
-  E.signpost = () => say(NAR, ['Up the stairs: School Hill. West: İstanbul, over the Bosphorus bridge. East: Work Street. South: the Lab Garden.', 'London is not on this sign. London is a train ride away.']);
-  E.lycee = async () => { await say(NAR, ['Bonjour ! The corridors smell faintly of croissants and exam anxiety.']); await UI.panel('lycee'); };
+  E.welcome = () => say(NAR, L(['HOŞ GELDİN — welcome to Baltaköy. Population: 1 (+ you).', '(“Köy” means village. “Balta” means axe. The axe is around here somewhere.)'], ['HOŞ GELDİN — Baltaköy’e hoş geldin. Nüfus: 1 (+ sen).', '(Adı Baltaköy, baltası da var. Buralarda bir yerde.)']));
+  E.signpost = () => say(NAR, L(['Up the stairs: School Hill. West: İstanbul, over the Bosphorus bridge. East: Work Street. South: the Lab Garden.', 'London is not on this sign. London is a train ride away.'], ['Merdivenlerden yukarı: Okul Tepesi. Batı: Boğaz köprüsünün ötesinde İstanbul. Doğu: İş Sokağı. Güney: Lab Bahçesi.', 'Londra bu tabelada yok. Londra bir tren yolculuğu uzakta.']));
+  E.lycee = async () => { await say(NAR, L(['Bonjour ! The corridors smell faintly of croissants and exam anxiety.'], ['Bonjour ! Koridorlara hafiften kruvasan ve sınav kaygısı kokusu sinmiş.'])); await UI.panel('lycee'); };
   E.msf = async () => {
-    await say(NAR, ['A chalkboard. “Mathématiques Sans Frontières — problème du jour.”']);
+    await say(NAR, L(['A chalkboard. “Mathématiques Sans Frontières — problème du jour.”'], ['Bir kara tahta. “Mathématiques Sans Frontières — problème du jour.” Yani günün problemi.']));
     for (;;) {
-      const c = await choose(NAR, 'A bat and a ball cost 1.10 in total. The bat costs 1.00 more than the ball. How much is the ball?', ['0.10', '0.05', '0.01', 'Walk away']);
-      if (c === 1) { await say(NAR, ['Exact ! The ball is 0.05, the bat is 1.05.', 'Second-place-at-Mathématiques-Sans-Frontières material. (That’s a compliment. Artun got second.)']); secret('msf'); return; }
+      const c = await choose(NAR, L('A bat and a ball cost 1.10 in total. The bat costs 1.00 more than the ball. How much is the ball?', 'Bir sopa ile bir top toplam 1,10. Sopa toptan 1,00 daha pahalı. Top kaç para?'), L(['0.10', '0.05', '0.01', 'Walk away'], ['0,10', '0,05', '0,01', 'Uzaklaş']));
+      if (c === 1) { await say(NAR, L(['Exact ! The ball is 0.05, the bat is 1.05.', 'Second-place-at-Mathématiques-Sans-Frontières material. (That’s a compliment. Artun got second.)'], ['Exact ! Top 0,05, sopa 1,05.', 'Tam Mathématiques Sans Frontières ikinciliği kıvamında. (İltifat bu. Artun ikinci olmuştu.)'])); secret('msf'); return; }
       if (c === 3) return;
-      await say(NAR, [c === 0 ? 'That’s the answer everyone’s fast brain gives. If the ball were 0.10, the bat would be 1.10, and together 1.20.' : 'Close, but then the bat is 1.01. Try again.']);
+      await say(NAR, [c === 0 ? L('That’s the answer everyone’s fast brain gives. If the ball were 0.10, the bat would be 1.10, and together 1.20.', 'Herkesin hızlı beyni bu cevabı verir. Top 0,10 olsaydı sopa 1,10 olurdu, toplamı da 1,20.') : L('Close, but then the bat is 1.01. Try again.', 'Yaklaştın, ama o zaman sopa 1,01 olur. Tekrar dene.')]);
     }
   };
-  E.bilkent = async () => { await say(NAR, ['The EE building. Somewhere inside, an oscilloscope is still showing a signal someone forgot about in 2023.']); await UI.panel('bilkent'); };
+  E.bilkent = async () => { await say(NAR, L(['The EE building. Somewhere inside, an oscilloscope is still showing a signal someone forgot about in 2023.'], ['EE binası. İçeride bir yerde, bir osiloskop hâlâ birinin 2023’te unuttuğu bir sinyali gösteriyor.'])); await UI.panel('bilkent'); };
   E.trophy = async () => {
-    const c = await choose(NAR, '1ST PLACE — Graduation Project Competition, out of 12 teams. Engraved underneath: “Scrollio”.', ['Polish it', 'Admire from a distance']);
-    if (c === 0) { Game.burst(77.4 * 16, 11.4 * 16, 16, [C.y3, C.white, C.y4], 35); SFX.coin(); await say(NAR, ['You polish it until you can see your own sprite in it.']); secret('trophy'); }
+    const c = await choose(NAR, L('1ST PLACE — Graduation Project Competition, out of 12 teams. Engraved underneath: “Scrollio”.', 'BİRİNCİLİK — Bitirme Projesi Yarışması, 12 takım arasında. Altına kazınmış: “Scrollio”.'), L(['Polish it', 'Admire from a distance'], ['Parlat', 'Uzaktan hayran ol']));
+    if (c === 0) { Game.burst(77.4 * 16, 11.4 * 16, 16, [C.y3, C.white, C.y4], 35); SFX.coin(); await say(NAR, L(['You polish it until you can see your own sprite in it.'], ['İçinde kendi sprite’ını görene kadar parlatıyorsun.'])); secret('trophy'); }
   };
   E.check = async () => {
-    await say(NAR, ['A comically large cheque: $3,000 in prize funding from the Bilkentpreneurs Challenge 2026. A little chalkboard tag is tied to it. It says “Chalk”.']);
-    const c = await choose(NAR, 'Chalk is what won it: an AI for teachers that turns one lesson video into a whole curriculum, with lessons for every level.', ['More about Chalk', 'Try to cash it', 'Leave']);
+    await say(NAR, L(['A comically large cheque: $3,000 in prize funding from the Bilkentpreneurs Challenge 2026. A little chalkboard tag is tied to it. It says “Chalk”.'], ['Komik derecede büyük bir çek: Bilkentpreneurs Challenge 2026’dan 3.000 dolarlık ödül fonu. Üstüne küçük bir kara tahta etiketi bağlanmış. “Chalk” yazıyor.']));
+    const c = await choose(NAR, L('Chalk is what won it: an AI for teachers that turns one lesson video into a whole curriculum, with lessons for every level.', 'Bunu kazandıran Chalk: tek bir ders videosunu her seviyeye uygun derslerle koca bir müfredata çeviren, öğretmenler için bir yapay zekâ.'), L(['More about Chalk', 'Try to cash it', 'Leave'], ['Chalk’u anlat', 'Bozdurmayı dene', 'Bırak']));
     if (c === 0) return UI.panel('chalk');
-    if (c === 1) await say(NAR, ['The bank refused to accept it. Not the money. The cheque. Physically. Too big for the slot.']);
+    if (c === 1) await say(NAR, L(['The bank refused to accept it. Not the money. The cheque. Physically. Too big for the slot.'], ['Banka kabul etmedi. Parayı değil. Çeki. Fiziksel olarak. Yuvaya sığmadı.']));
   };
   E.physics = async () => { await UI.panel('ta'); };
   E.apple = async () => {
-    const c = await choose(NAR, 'An apple tree by the physics lab. Feels symbolic.', ['Shake it', 'Leave it alone']);
+    const c = await choose(NAR, L('An apple tree by the physics lab. Feels symbolic.', 'Fizik laboratuvarının yanında bir elma ağacı. Sembolik bir havası var.'), L(['Shake it', 'Leave it alone'], ['Salla', 'Rahat bırak']));
     if (c) return;
     UI.endDlg(); Game.lock();
     const p = P(); let y = p.y - 46; const x = p.x;
@@ -178,30 +186,30 @@ const Eggs = (() => {
       const fall = { x, y, sortY: 1e9, draw(g, cx, cy) { const k = Game.t - t0; const yy = y + 0.5 * 600 * k * k; rect(g, x - 2 - cx, Math.min(yy, p.y - 22) - cy, 4, 4, C.r2); px(g, x - cx, Math.min(yy, p.y - 22) - cy - 1, C.g2); if (yy >= p.y - 22 && !fall.hit) { fall.hit = 1; res(); } } };
       Game.addObj(fall); setTimeout(() => { fall.hidden = true; }, 1400);
     });
-    SFX.thud(); Game.G.shake = 4; Game.particle({ x, y: p.y - 26, vy: -20, life: 1.2, kind: 'text', text: 'BONK', col: C.y3 });
+    SFX.thud(); Game.G.shake = 4; Game.particle({ x, y: p.y - 26, vy: -20, life: 1.2, kind: 'text', text: L('BONK', 'KÜT'), col: C.y3 });
     Game.unlock();
-    await say(NAR, ['BONK.', '9.81 m/s², applied directly to the head. You now understand gravity, PHYS101-style.', 'The TA would like you to write that up. With error bars.']);
+    await say(NAR, L(['BONK.', '9.81 m/s², applied directly to the head. You now understand gravity, PHYS101-style.', 'The TA would like you to write that up. With error bars.'], ['KÜT.', '9,81 m/s², doğrudan kafaya uygulandı. Artık yerçekimini PHYS101 usulü anladın.', 'Asistan bunun raporunu istiyor. Hata çubuklarıyla.']));
     secret('apple');
   };
-  E.volina = async () => { await say(NAR, ['volina. — inside, someone is saying “the agent just handled that objection better than I would have”, out loud, to nobody.']); await UI.panel('volina'); };
+  E.volina = async () => { await say(NAR, L(['volina. — inside, someone is saying “the agent just handled that objection better than I would have”, out loud, to nobody.'], ['volina. — içeride biri yüksek sesle, kimseye değil, “ajan o itirazı benden iyi karşıladı” diyor.'])); await UI.panel('volina'); };
   E.voli = async () => {
-    await say(SP.voli, ['Hi! I’m Voli — volina.’s mascot. Here for you!', 'I make the calls, I do the follow-ups, and I never let a good conversation go cold.', 'Also I’m a tooth. Don’t make it weird.']);
-    const c = await choose(SP.voli, 'High five?', ['High five!', 'Do teeth even have hands?']);
-    if (c === 0) { SFX.pop(); for (let i = 0; i < 5; i++) Game.heart(91.6 * 16 + (Math.random() - 0.5) * 16, 23.2 * 16); await say(SP.voli, ['Yesss. A little nudge from Voli: floss tonight. I’ll know.']); }
-    else await say(SP.voli, ['…', 'That’s a very personal question.']);
+    await say(SP.voli, L(['Hi! I’m Voli — volina.’s mascot. Here for you!', 'I make the calls, I do the follow-ups, and I never let a good conversation go cold.', 'Also I’m a tooth. Don’t make it weird.'], ['Selam! Ben Voli — volina.’nın maskotu. Senin için buradayım!', 'Aramaları ben yaparım, takibi ben yaparım, iyi bir sohbeti asla soğutmam.', 'Bir de dişim. Bunu tuhaflaştırma.']));
+    const c = await choose(SP.voli, L('High five?', 'Çak bir beşlik?'), L(['High five!', 'Do teeth even have hands?'], ['Çak!', 'Dişlerin eli mi var ki?']));
+    if (c === 0) { SFX.pop(); for (let i = 0; i < 5; i++) Game.heart(91.6 * 16 + (Math.random() - 0.5) * 16, 23.2 * 16); await say(SP.voli, L(['Yesss. A little nudge from Voli: floss tonight. I’ll know.'], ['Evettt. Voli’den ufak bir hatırlatma: bu akşam diş ipi kullan. Anlarım.'])); }
+    else await say(SP.voli, L(['…', 'That’s a very personal question.'], ['…', 'Bu çok kişisel bir soru.']));
   };
   E.aselsan = () => UI.panel('aselsan');
   E.labSign = () => UI.panel('more');
 
   /* ---------- radar: shows where the secrets you haven't found are ---------- */
   E.radar = async () => {
-    if (!gateOpen) { await say(NAR, ['A big radar dish. It is spinning with great confidence.', '(The guard at the gate is watching you very hard.)']); return; }
+    if (!gateOpen) { await say(NAR, L(['A big radar dish. It is spinning with great confidence.', '(The guard at the gate is watching you very hard.)'], ['Koca bir radar çanağı. Büyük bir özgüvenle dönüyor.', '(Kapıdaki bekçi gözünü senden ayırmıyor.)'])); return; }
     const c = canvas(220, 220); c.className = 'scope';
-    const node = html(`<p class="lead">Airborne-radar habits die hard. CFAR thresholding, tuned to find <b>things you haven’t found yet</b>.</p>`);
+    const node = html(L(`<p class="lead">Airborne-radar habits die hard. CFAR thresholding, tuned to find <b>things you haven’t found yet</b>.</p>`, `<p class="lead">Hava radarı alışkanlıkları kolay geçmiyor. CFAR eşiklemesi, <b>henüz bulamadığın şeyleri</b> bulmaya ayarlı.</p>`));
     node.appendChild(c);
     const legend = html(''); legend.className = 'scopeLegend'; node.appendChild(legend);
     const targets = Object.keys(SECRETS).filter(id => !Game.found().has(id) && E.secretPos[id]).map(id => ({ id, x: E.secretPos[id][0], y: E.secretPos[id][1], seen: -9 }));
-    legend.innerHTML = targets.length ? `<b>${targets.length}</b> contacts. False alarm rate: constant. Blinking dot: you.` : 'No contacts. You found everything. The radar is, frankly, impressed.';
+    legend.innerHTML = targets.length ? L(`<b>${targets.length}</b> contacts. False alarm rate: constant. Blinking dot: you.`, `<b>${targets.length}</b> temas. Yanlış alarm oranı: sabit. Yanıp sönen nokta: sen.`) : L('No contacts. You found everything. The radar is, frankly, impressed.', 'Temas yok. Her şeyi buldun. Radar, açıkçası, etkilendi.');
     // land mask once
     const land = canvas(220, 220);
     const s = 220 / (MAP_W * 16);
@@ -233,7 +241,7 @@ const Eggs = (() => {
     SFX.radar(); const ping = setInterval(() => SFX.radar(), 2860);
     draw();
     secret('radar');
-    await UI.custom({ kicker: 'ASELSAN · yard', title: 'Radar sweep', accent: 'green', node, onClose: () => { run = false; clearInterval(ping); } });
+    await UI.custom({ kicker: L('ASELSAN · yard', 'ASELSAN · bahçe'), title: L('Radar sweep', 'Radar taraması'), accent: 'green', node, onClose: () => { run = false; clearInterval(ping); } });
   };
   let dishA = 0;
   E.drawRadarDish = (g, x, y, t) => {
@@ -246,12 +254,12 @@ const Eggs = (() => {
 
   /* ---------- the Lab Garden ---------- */
   E.mri = async () => {
-    const c = await choose(NAR, 'An MRI scanner. The sign says: PARALLEL IMAGING DEMO · LIE STILL · 11 TAPS.', ['Scan my brain', 'Read about the research', 'No thanks']);
+    const c = await choose(NAR, L('An MRI scanner. The sign says: PARALLEL IMAGING DEMO · LIE STILL · 11 TAPS.', 'Bir MR cihazı. Tabelada şu yazıyor: PARALEL GÖRÜNTÜLEME DEMOSU · KIPIRDAMA · 11 TAP.'), L(['Scan my brain', 'Read about the research', 'No thanks'], ['Beynimi tara', 'Araştırmayı oku', 'Yok, sağ ol']));
     if (c === 1) return UI.panel('mri');
     if (c === 2) return;
-    const node = html(`<p class="lead" data-step>Lie still. Acquiring k-space at twice the speed — by skipping every other line.</p>`);
+    const node = html(L(`<p class="lead" data-step>Lie still. Acquiring k-space at twice the speed — by skipping every other line.</p>`, `<p class="lead" data-step>Kıpırdama. k-uzayı iki kat hızla toplanıyor — her iki satırdan birini atlayarak.</p>`));
     const cvs = canvas(64, 64); cvs.className = 'mri'; node.appendChild(cvs);
-    const btn = document.createElement('button'); btn.className = 'btn'; btn.textContent = 'Reconstruct ▸'; node.appendChild(btn);
+    const btn = document.createElement('button'); btn.className = 'btn'; btn.textContent = L('Reconstruct ▸', 'Yeniden oluştur ▸'); node.appendChild(btn);
     const note = html(''); note.className = 'mriNote'; node.appendChild(note);
     const brain = makeBrain();
     let step = 0;
@@ -264,19 +272,23 @@ const Eggs = (() => {
       for (let i = 0; i < 64 * 64 * noise; i++) { g.fillStyle = `rgba(255,255,255,${Math.random() * 0.25})`; g.fillRect((Math.random() * 64) | 0, (Math.random() * 64) | 0, 1, 1); }
     };
     render();
-    const texts = [
+    const texts = L([
       ['Standard kernel rule: 19 calibration taps. Ghosts mostly gone. Mostly.', 'Physics-derived kernel ▸'],
       ['Kernel support derived from the acquisition physics: 11 taps, +0.65 dB. Clean.', 'Diagnosis ▸'],
       ['Radiology report: unremarkable. One small dog in the left frontal lobe — answers to Paşa. Probably fine. Very common in dog people.', 'Done'],
-    ];
+    ], [
+      ['Standart çekirdek kuralı: 19 kalibrasyon tap’i. Hayaletler büyük ölçüde gitti. Büyük ölçüde.', 'Fizikten türetilmiş çekirdek ▸'],
+      ['Çekirdek desteği çekim fiziğinden türetildi: 11 tap, +0,65 dB. Tertemiz.', 'Teşhis ▸'],
+      ['Radyoloji raporu: olağan. Sol frontal lobda küçük bir köpek — Paşa ismine yanıt veriyor. Muhtemelen sorun yok. Köpekseverlerde çok yaygın.', 'Tamam'],
+    ]);
     btn.addEventListener('click', () => {
       if (step >= 2) { UI.closePanel(); return; }
       step++; render(); SFX.select();
       node.querySelector('[data-step]').textContent = texts[step - 1][0];
       btn.textContent = texts[step - 1][1];
-      if (step === 2) { note.innerHTML = 'Want the real version? <a href="#" data-more>Read about the research ↗</a>'; note.querySelector('[data-more]').onclick = (e) => { e.preventDefault(); UI.closePanel(); setTimeout(() => UI.panel('mri'), 50); }; secret('mri'); }
+      if (step === 2) { note.innerHTML = L('Want the real version? <a href="#" data-more>Read about the research ↗</a>', 'Gerçeğini mi istiyorsun? <a href="#" data-more>Araştırmayı oku ↗</a>'); note.querySelector('[data-more]').onclick = (e) => { e.preventDefault(); UI.closePanel(); setTimeout(() => UI.panel('mri'), 50); }; secret('mri'); }
     });
-    await UI.custom({ kicker: 'Lab Garden', title: 'Brain scan', accent: 'teal', node });
+    await UI.custom({ kicker: L('Lab Garden', 'Lab Bahçesi'), title: L('Brain scan', 'Beyin taraması'), accent: 'teal', node });
   };
   function makeBrain() {
     const c = canvas(64, 64), g = c.g;
@@ -296,17 +308,17 @@ const Eggs = (() => {
   }
   let mindStats = store.get('mind', [0, 0]);
   E.eeg = async () => {
-    const c = await choose(NAR, 'A mannequin head in an EEG cap, wired to a monitor. A sign: “IMAGINED SPEECH DECODER · 4 CLASSES · 46%”.', ['Try it', 'Read about the research', 'Leave']);
+    const c = await choose(NAR, L('A mannequin head in an EEG cap, wired to a monitor. A sign: “IMAGINED SPEECH DECODER · 4 CLASSES · 46%”.', 'EEG başlığı takılı, bir monitöre bağlı bir manken kafası. Tabela: “İMGELENEN KONUŞMA ÇÖZÜCÜSÜ · 4 SINIF · %46”.'), L(['Try it', 'Read about the research', 'Leave'], ['Dene', 'Araştırmayı oku', 'Bırak']));
     if (c === 1) return UI.panel('eeg');
     if (c === 2) return;
-    await say(NAR, ['Think of one direction: UP, DOWN, LEFT or RIGHT.', 'Don’t say it. Don’t press anything. Just… imagine saying it.']);
+    await say(NAR, L(['Think of one direction: UP, DOWN, LEFT or RIGHT.', 'Don’t say it. Don’t press anything. Just… imagine saying it.'], ['Bir yön düşün: YUKARI, AŞAĞI, SOL ya da SAĞ.', 'Söyleme. Hiçbir şeye basma. Sadece… söylediğini hayal et.']));
     E.eegBusy = Game.t;
-    await say(NAR, ['Recording… (the squiggles get very excited)', 'Decoding…']);
-    const guess = pick(['UP', 'DOWN', 'LEFT', 'RIGHT']);
-    const r = await choose(NAR, `You were thinking… ${guess}. Was I right?`, ['Yes!', 'No']);
+    await say(NAR, L(['Recording… (the squiggles get very excited)', 'Decoding…'], ['Kaydediliyor… (dalgalar epey heyecanlanıyor)', 'Çözümleniyor…']));
+    const guess = pick(L(['UP', 'DOWN', 'LEFT', 'RIGHT'], ['YUKARI', 'AŞAĞI', 'SOL', 'SAĞ']));
+    const r = await choose(NAR, L(`You were thinking… ${guess}. Was I right?`, `Düşündüğün yön… ${guess}. Bildim mi?`), L(['Yes!', 'No'], ['Evet!', 'Hayır']));
     mindStats[1]++; if (r === 0) mindStats[0]++; store.set('mind', mindStats);
     const pct = Math.round(100 * mindStats[0] / mindStats[1]);
-    await say(NAR, [r === 0 ? 'Told you.' : 'Within the confidence interval, then.', `Running accuracy on this device: ${mindStats[0]}/${mindStats[1]} (${pct}%). The real decoder: 46% against 25% chance.`, '(The real one used actual EEG. This one used Math.random. Science is about being honest with your baseline.)']);
+    await say(NAR, [r === 0 ? L('Told you.', 'Demiştim.') : L('Within the confidence interval, then.', 'O zaman güven aralığının içinde.'), L(`Running accuracy on this device: ${mindStats[0]}/${mindStats[1]} (${pct}%). The real decoder: 46% against 25% chance.`, `Bu cihazdaki anlık doğruluk: ${mindStats[0]}/${mindStats[1]} (%${pct}). Gerçek çözücü: %25 şansa karşı %46.`), L('(The real one used actual EEG. This one used Math.random. Science is about being honest with your baseline.)', '(Gerçeği gerçek EEG kullanıyordu. Bu, Math.random kullandı. Bilim, taban çizginle dürüst olmaktır.)')]);
     secret('mind');
   };
   E.drawEEGScreen = (g, x, y, w, h, t) => {
@@ -324,15 +336,15 @@ const Eggs = (() => {
     }
   };
   E.faces = async () => {
-    const c = await choose(NAR, 'Two portraits. A small card: “One is a real person. One is synthetic. Which is real?”', ['The left one', 'The right one']);
-    await say(NAR, [c === 0 ? 'Good instinct. The right one has three ears, two of them on one side.' : 'Bold. The right one has three ears. That’s usually the tell.', 'Trick question, though: they’re both sixteen pixels wide.', '(Artun built a CNN from scratch to tell real faces from synthetic ones. It would have caught the ears too.)']);
+    const c = await choose(NAR, L('Two portraits. A small card: “One is a real person. One is synthetic. Which is real?”', 'İki portre. Küçük bir kart: “Biri gerçek bir insan. Biri sentetik. Hangisi gerçek?”'), L(['The left one', 'The right one'], ['Soldaki', 'Sağdaki']));
+    await say(NAR, [c === 0 ? L('Good instinct. The right one has three ears, two of them on one side.', 'İyi sezgi. Sağdakinin üç kulağı var, ikisi aynı tarafta.') : L('Bold. The right one has three ears. That’s usually the tell.', 'Cesurca. Sağdakinin üç kulağı var. Genelde ele veren de bu olur.'), L('Trick question, though: they’re both sixteen pixels wide.', 'Ama soru biraz kazıklıydı: ikisi de on altı piksel genişliğinde.'), L('(Artun built a CNN from scratch to tell real faces from synthetic ones. It would have caught the ears too.)', '(Artun, gerçek yüzleri sentetik olanlardan ayırmak için sıfırdan bir CNN yazdı. Kulakları o da yakalardı.)')]);
     secret('faces');
   };
   // Jenga: the robot pulls, the tower grows, physics eventually wins
   const J = { n: 0, fallen: 0, best: store.get('jenga', 0), anim: 0 };
   E.jenga = async () => {
-    if (!Game.flag('jengaIntro')) { Game.flag('jengaIntro', 1); await say(NAR, ['A robot arm, a Jenga tower, and a sign: “LEARNED BLOCK SELECTION + OPTIMISATION-BASED MOTION PLANNING. DO NOT BUMP THE TABLE.”']); }
-    const c = await choose(NAR, J.fallen ? 'The tower is back up. The robot looks determined.' : `Blocks pulled this round: ${J.n}. Record: ${J.best}.`, ['Let the robot pull one', 'Read about it', 'Leave']);
+    if (!Game.flag('jengaIntro')) { Game.flag('jengaIntro', 1); await say(NAR, L(['A robot arm, a Jenga tower, and a sign: “LEARNED BLOCK SELECTION + OPTIMISATION-BASED MOTION PLANNING. DO NOT BUMP THE TABLE.”'], ['Bir robot kol, bir Jenga kulesi ve bir tabela: “ÖĞRENİLMİŞ BLOK SEÇİMİ + OPTİMİZASYON TABANLI HAREKET PLANLAMA. MASAYA ÇARPMAYIN.”'])); }
+    const c = await choose(NAR, J.fallen ? L('The tower is back up. The robot looks determined.', 'Kule yeniden dikildi. Robot kararlı görünüyor.') : L(`Blocks pulled this round: ${J.n}. Record: ${J.best}.`, `Bu turda çekilen blok: ${J.n}. Rekor: ${J.best}.`), L(['Let the robot pull one', 'Read about it', 'Leave'], ['Robot bir tane çeksin', 'Hakkında oku', 'Bırak']));
     if (c === 1) return UI.panel('jenga');
     if (c === 2) return;
     UI.endDlg(); J.fallen = 0; J.anim = Game.t;
@@ -341,10 +353,10 @@ const Eggs = (() => {
     if (Math.random() < pFall) {
       J.fall = Game.t; SFX.crash(); Game.G.shake = 3;
       await Game.wait(0.8);
-      await say(NAR, [`CRASH. After ${J.n} block${J.n === 1 ? '' : 's'}.`, 'Contact-rich manipulation remains an open problem. The robot pretends it meant to do that.']);
+      await say(NAR, L([`CRASH. After ${J.n} block${J.n === 1 ? '' : 's'}.`, 'Contact-rich manipulation remains an open problem. The robot pretends it meant to do that.'], [`GÜM. ${J.n} bloktan sonra.`, 'Temas yoğun manipülasyon hâlâ açık bir problem. Robot bunu bilerek yapmış gibi davranıyor.']));
       J.best = Math.max(J.best, J.n); store.set('jenga', J.best); J.n = 0; J.fallen = 1; J.fall = 0;
       secret('jenga');
-    } else { J.n++; SFX.tick(); await say(NAR, [pick(['Clean pull. Block placed on top.', 'The arm hesitates, re-plans, and slides it out.', 'Wobble. No fall.']) + ` (${J.n})`]); }
+    } else { J.n++; SFX.tick(); await say(NAR, [pick(L(['Clean pull. Block placed on top.', 'The arm hesitates, re-plans, and slides it out.', 'Wobble. No fall.'], ['Temiz çekiş. Blok tepeye kondu.', 'Kol duraksıyor, yeniden planlıyor ve bloğu kaydırıp çıkarıyor.', 'Sallantı. Ama düşmedi.'])) + ` (${J.n})`]); }
   };
   E.drawJenga = (g, x, y, t) => {
     // tower: 18 levels of 3 blocks, centered at x
@@ -369,8 +381,8 @@ const Eggs = (() => {
   };
   let fpgaMode = 0;
   E.fpga = async () => {
-    const c = await choose(NAR, 'An FPGA board running a colour-sensing joint controller written in VHDL.', ['Flash a new bitstream', 'Read the label']);
-    if (c === 0) { await say(NAR, ['Synthesising…', 'Place and route…', 'Timing met on the first try.', 'Suspicious.']); fpgaMode = (fpgaMode + 1) % 3; SFX.select(); }
+    const c = await choose(NAR, L('An FPGA board running a colour-sensing joint controller written in VHDL.', 'VHDL ile yazılmış, renk algılayan bir eklem kontrolcüsü çalıştıran bir FPGA kartı.'), L(['Flash a new bitstream', 'Read the label'], ['Yeni bir bitstream yükle', 'Etiketi oku']));
+    if (c === 0) { await say(NAR, L(['Synthesising…', 'Place and route…', 'Timing met on the first try.', 'Suspicious.'], ['Sentezleniyor…', 'Yerleştirme ve yönlendirme…', 'Zamanlama ilk denemede tuttu.', 'Şüpheli.'])); fpgaMode = (fpgaMode + 1) % 3; SFX.select(); }
     else await UI.panel('more');
   };
   E.drawFPGA = (g, x, y, t) => {
@@ -381,23 +393,25 @@ const Eggs = (() => {
   };
   let best = store.get('react', 0);
   E.arcade = async () => {
-    const node = html(`<p class="lead">ARM Cortex-M0+, 48 MHz, one button. Wait for green, then press as fast as you can.</p>
-      <div class="react" data-r>PRESS TO START</div><p class="mriNote" data-res>${best ? `Best on this device: <b>${best} ms</b>` : '&nbsp;'}</p>`);
+    const node = html(L(`<p class="lead">ARM Cortex-M0+, 48 MHz, one button. Wait for green, then press as fast as you can.</p>
+      <div class="react" data-r>PRESS TO START</div><p class="mriNote" data-res>${best ? `Best on this device: <b>${best} ms</b>` : '&nbsp;'}</p>`,
+      `<p class="lead">ARM Cortex-M0+, 48 MHz, tek buton. Yeşili bekle, sonra olabildiğince hızlı bas.</p>
+      <div class="react" data-r>BAŞLAMAK İÇİN BAS</div><p class="mriNote" data-res>${best ? `Bu cihazdaki en iyi: <b>${best} ms</b>` : '&nbsp;'}</p>`));
     const pad = node.querySelector('[data-r]'), res = node.querySelector('[data-res]');
     let state = 'idle', t0 = 0, to = null;
     const go = () => {
-      if (state === 'idle' || state === 'done') { state = 'wait'; pad.className = 'react wait'; pad.textContent = 'wait for green…'; to = setTimeout(() => { state = 'go'; pad.className = 'react go'; pad.textContent = 'NOW!'; t0 = performance.now(); SFX.select(); }, 1200 + Math.random() * 2600); }
-      else if (state === 'wait') { clearTimeout(to); state = 'done'; pad.className = 'react'; pad.textContent = 'TOO SOON — press to retry'; res.innerHTML = 'False alarm. A CFAR detector would be disappointed in you.'; }
+      if (state === 'idle' || state === 'done') { state = 'wait'; pad.className = 'react wait'; pad.textContent = L('wait for green…', 'yeşili bekle…'); to = setTimeout(() => { state = 'go'; pad.className = 'react go'; pad.textContent = L('NOW!', 'ŞİMDİ!'); t0 = performance.now(); SFX.select(); }, 1200 + Math.random() * 2600); }
+      else if (state === 'wait') { clearTimeout(to); state = 'done'; pad.className = 'react'; pad.textContent = L('TOO SOON — press to retry', 'ÇOK ERKEN — tekrar için bas'); res.innerHTML = L('False alarm. A CFAR detector would be disappointed in you.', 'Yanlış alarm. Bir CFAR dedektörü sana çok bozulurdu.'); }
       else if (state === 'go') {
-        const ms = Math.round(performance.now() - t0); state = 'done'; pad.className = 'react'; pad.textContent = `${ms} ms — press to retry`;
+        const ms = Math.round(performance.now() - t0); state = 'done'; pad.className = 'react'; pad.textContent = L(`${ms} ms — press to retry`, `${ms} ms — tekrar için bas`);
         if (!best || ms < best) { best = ms; store.set('react', ms); }
-        res.innerHTML = `${ms < 180 ? 'Are you a spinal reflex?' : ms < 250 ? 'Radar-grade reflexes.' : ms < 350 ? 'Solidly human.' : 'Were you on the Tube?'} · Best: <b>${best} ms</b>`;
+        res.innerHTML = L(`${ms < 180 ? 'Are you a spinal reflex?' : ms < 250 ? 'Radar-grade reflexes.' : ms < 350 ? 'Solidly human.' : 'Were you on the Tube?'} · Best: <b>${best} ms</b>`, `${ms < 180 ? 'Sen omurilik refleksi misin?' : ms < 250 ? 'Radar ayarında refleksler.' : ms < 350 ? 'Sapına kadar insan.' : 'Metrobüste miydin?'} · En iyi: <b>${best} ms</b>`);
         secret('arcade');
       }
     };
     pad.addEventListener('pointerdown', e => { e.preventDefault(); go(); });
     Game.G.panelKeys = (e) => { if (e.key !== 'Escape') { e.preventDefault(); go(); } };
-    await UI.custom({ kicker: 'Lab Garden · arcade', title: 'M0+ reaction test', accent: 'violet', node, onClose: () => { clearTimeout(to); Game.G.panelKeys = null; } });
+    await UI.custom({ kicker: L('Lab Garden · arcade', 'Lab Bahçesi · atari'), title: L('M0+ reaction test', 'M0+ refleks testi'), accent: 'violet', node, onClose: () => { clearTimeout(to); Game.G.panelKeys = null; } });
   };
   E.drawArcade = (g, x, y, t) => {
     rect(g, x, y, 10, 8, C.b0);
@@ -406,30 +420,34 @@ const Eggs = (() => {
     px(g, x + 2, y + 2, C.c3); px(g, x + 7, y + 1, C.p2);
   };
   E.xray = async () => {
-    await say(NAR, ['A lightbox with a hand X-ray. Sticker: “ASK ME — medical VQA, low-rank adapted.”']);
-    const c = await choose(NAR, 'Ask the X-ray a question:', ['Is there a fracture?', 'How many fingers?', 'What’s LoRA?']);
-    const ans = [
+    await say(NAR, L(['A lightbox with a hand X-ray. Sticker: “ASK ME — medical VQA, low-rank adapted.”'], ['Işıklı bir panoda el röntgeni. Etiket: “BANA SOR — tıbbi VQA, low-rank uyarlanmış.”']));
+    const c = await choose(NAR, L('Ask the X-ray a question:', 'Röntgene bir soru sor:'), L(['Is there a fracture?', 'How many fingers?', 'What’s LoRA?'], ['Kırık var mı?', 'Kaç parmak var?', 'LoRA nedir?']));
+    const ans = L([
       'No fracture. Mild wear on the index finger, consistent with hand-deriving gradients in NumPy.',
       'Five. Unlike the portrait on the easel. (Checked twice.)',
       'Low-Rank Adaptation: instead of retraining a huge model, you learn a small low-rank update to its weights. Like adapting to London by only changing the necessary opinions.',
-    ][c];
-    await say({ name: 'X-RAY', color: 'var(--navy)', voice: 6 }, [ans]);
+    ], [
+      'Kırık yok. İşaret parmağında hafif aşınma; NumPy’da elle gradyan türetmekle uyumlu.',
+      'Beş. Şövaledeki portrenin aksine. (İki kez kontrol edildi.)',
+      'Low-Rank Adaptation: dev bir modeli baştan eğitmek yerine, ağırlıklarına küçük, düşük ranklı bir güncelleme öğrenirsin. Londra’ya sadece gereken fikirlerini değiştirerek uyum sağlamak gibi.',
+    ])[c];
+    await say({ name: L('X-RAY', 'RÖNTGEN'), color: 'var(--navy)', voice: 6 }, [ans]);
     secret('xray');
   };
   E.tesla = async () => {
-    const c = await choose(NAR, 'A home-made Tesla coil, humming. Small purple lightning is licking the air.', ['Touch it', 'Absolutely not']);
-    if (c) { await say(NAR, ['Wise. The coil seems disappointed in you.']); return; }
+    const c = await choose(NAR, L('A home-made Tesla coil, humming. Small purple lightning is licking the air.', 'Ev yapımı bir Tesla bobini, vızıldıyor. Küçük mor şimşekler havayı yalıyor.'), L(['Touch it', 'Absolutely not'], ['Dokun', 'Asla']));
+    if (c) { await say(NAR, L(['Wise. The coil seems disappointed in you.'], ['Akıllıca. Bobin senden biraz hayal kırıklığına uğramış gibi.'])); return; }
     UI.endDlg(); Game.lock();
     SFX.zap(); Game.G.flash = 1; Game.G.shake = 6;
     const p = P(); const old = p.look;
     p.setLook(Object.assign({}, old, { style: 'spiky' }));
     Game.burst(p.x, p.y - 16, 22, [C.v3, C.white, C.y3], 60);
     await Game.wait(0.6); Game.unlock();
-    await say(NAR, ['ZAP.', 'Your hair is now 100% conductive. It will calm down in a minute. Probably.']);
+    await say(NAR, L(['ZAP.', 'Your hair is now 100% conductive. It will calm down in a minute. Probably.'], ['ZZZT.', 'Saçların artık %100 iletken. Bir dakikaya yatışır. Muhtemelen.']));
     secret('zap');
     setTimeout(() => { if (p.look.style === 'spiky') p.setLook(old); }, 16000);
   };
-  E.probe = () => say(NAR, ['DANGER — HIGH VOLTAGE.', 'Smaller print: “Field measured with a home-made JFET high-impedance probe. Non-contact. Like a good first date.”']);
+  E.probe = () => say(NAR, L(['DANGER — HIGH VOLTAGE.', 'Smaller print: “Field measured with a home-made JFET high-impedance probe. Non-contact. Like a good first date.”'], ['TEHLİKE — YÜKSEK GERİLİM.', 'Altında küçük harflerle: “Alan, ev yapımı yüksek empedanslı bir JFET probuyla ölçülmüştür. Temassız. İyi bir ilk buluşma gibi.”']));
   E.drawSparks = (g, x, y, t) => {
     const near = Math.hypot(P().x - x - 0, P().y - y - 36) < 40;
     const n = near ? 3 : (Math.floor(t * 10) % 3 === 0 ? 1 : 0);
@@ -459,12 +477,14 @@ const Eggs = (() => {
   };
 
   /* ================= İstanbul ================= */
-  E.mimlab = async () => { await say(NAR, ['Boğaziçi. The view of the Bosphorus from here is so good that nobody gets any work done. (They do. Mostly EEG.)']); await UI.panel('mimlab'); };
+  E.mimlab = async () => { await say(NAR, L(['Boğaziçi. The view of the Bosphorus from here is so good that nobody gets any work done. (They do. Mostly EEG.)'], ['Boğaziçi. Buradan Boğaz manzarası o kadar güzel ki kimse iş yapamıyor. (Yapıyorlar aslında. Çoğunlukla EEG.)'])); await UI.panel('mimlab'); };
   // 2-back: press MATCH when the letter equals the one two steps back
   E.nback = async () => {
-    const node = html(`<p class="lead">A 2-back task, the kind used to load up working memory during EEG recordings. Press <b>MATCH</b> (or Space) when the letter is the same as the one <b>two steps back</b>.</p>
-      <div class="nback"><div class="nl" data-l>·</div><button class="btn" data-m>MATCH</button></div><p class="mriNote" data-res>15 letters. Ready when you are.</p><button class="btn ghost" data-go>Start</button>`);
-    const L = node.querySelector('[data-l]'), M = node.querySelector('[data-m]'), R = node.querySelector('[data-res]'), GO = node.querySelector('[data-go]');
+    const node = html(L(`<p class="lead">A 2-back task, the kind used to load up working memory during EEG recordings. Press <b>MATCH</b> (or Space) when the letter is the same as the one <b>two steps back</b>.</p>
+      <div class="nback"><div class="nl" data-l>·</div><button class="btn" data-m>MATCH</button></div><p class="mriNote" data-res>15 letters. Ready when you are.</p><button class="btn ghost" data-go>Start</button>`,
+      `<p class="lead">Bir 2-back görevi: EEG kayıtlarında çalışan belleği yüklemek için kullanılan türden. Harf, <b>iki adım önceki</b> harfle aynıysa <b>AYNI</b>’ya (ya da Boşluk’a) bas.</p>
+      <div class="nback"><div class="nl" data-l>·</div><button class="btn" data-m>AYNI</button></div><p class="mriNote" data-res>15 harf. Hazır olduğunda başla.</p><button class="btn ghost" data-go>Başla</button>`));
+    const LT = node.querySelector('[data-l]'), M = node.querySelector('[data-m]'), R = node.querySelector('[data-res]'), GO = node.querySelector('[data-go]');
     let seqL = [], i = -1, timer = null, pressed = false, hits = 0, misses = 0, fas = 0, crs = 0;
     const letters = 'BCDFGHKLMNPQRSTVXZ';
     const makeSeq = () => { const s = []; for (let k = 0; k < 15; k++) s.push(k >= 2 && Math.random() < 0.33 ? s[k - 2] : letters[(Math.random() * letters.length) | 0]); return s; };
@@ -472,61 +492,63 @@ const Eggs = (() => {
       if (i >= 2) { const target = seqL[i] === seqL[i - 2]; if (target) pressed ? hits++ : misses++; else pressed ? fas++ : crs++; }
       i++; pressed = false; M.classList.remove('hit');
       if (i >= seqL.length) return finish();
-      L.textContent = seqL[i]; L.classList.remove('pop'); void L.offsetWidth; L.classList.add('pop'); SFX.tick();
+      LT.textContent = seqL[i]; LT.classList.remove('pop'); void LT.offsetWidth; LT.classList.add('pop'); SFX.tick();
       timer = setTimeout(step, 1700);
     };
     const press = () => { if (i < 0 || i >= seqL.length || pressed) return; pressed = true; M.classList.add('hit'); SFX.select(); };
     const finish = () => {
-      L.textContent = '✓';
+      LT.textContent = '✓';
       const z = p => { p = clamp(p, 0.01, 0.99); const a = [2.50662823884, -18.61500062529, 41.39119773534, -25.44106049637], b = [-8.47351093090, 23.08336743743, -21.06224101826, 3.13082909833]; const q = p - 0.5; if (Math.abs(q) < 0.42) { const r = q * q; return q * (((a[3] * r + a[2]) * r + a[1]) * r + a[0]) / ((((b[3] * r + b[2]) * r + b[1]) * r + b[0]) * r + 1); } let r = p; if (q > 0) r = 1 - p; r = Math.log(-Math.log(r)); const c = [0.3374754822726147, 0.9761690190917186, 0.1607979714918209, 0.0276438810333863, 0.0038405729373609, 0.0003951896511919, 0.0000321767881768, 0.0000002888167364, 0.0000003960315187]; let x = c[0] + r * (c[1] + r * (c[2] + r * (c[3] + r * (c[4] + r * (c[5] + r * (c[6] + r * (c[7] + r * c[8]))))))); return q < 0 ? -x : x; };
       const hr = (hits + 0.5) / (hits + misses + 1), far = (fas + 0.5) / (fas + crs + 1);
       const dp = (z(hr) - z(far)).toFixed(2);
-      R.innerHTML = `Hits ${hits} · misses ${misses} · false alarms ${fas}. Your sensitivity: <b>d′ = ${dp}</b>.<br>Cognitive workload: <b>${dp > 2 ? 'handled it' : 'HIGH'}</b>. Recommended intervention: çay.`;
-      GO.textContent = 'Again'; GO.style.display = '';
+      R.innerHTML = L(`Hits ${hits} · misses ${misses} · false alarms ${fas}. Your sensitivity: <b>d′ = ${dp}</b>.<br>Cognitive workload: <b>${dp > 2 ? 'handled it' : 'HIGH'}</b>. Recommended intervention: çay.`,
+        `İsabet ${hits} · kaçan ${misses} · yanlış alarm ${fas}. Duyarlılığın: <b>d′ = ${dp}</b>.<br>Bilişsel yük: <b>${dp > 2 ? 'kontrol altında' : 'YÜKSEK'}</b>. Önerilen müdahale: çay.`);
+      GO.textContent = L('Again', 'Tekrar'); GO.style.display = '';
       secret('nback');
     };
-    GO.addEventListener('click', () => { seqL = makeSeq(); i = -1; hits = misses = fas = crs = 0; GO.style.display = 'none'; R.textContent = 'Focus…'; setTimeout(step, 600); });
+    GO.addEventListener('click', () => { seqL = makeSeq(); i = -1; hits = misses = fas = crs = 0; GO.style.display = 'none'; R.textContent = L('Focus…', 'Odaklan…'); setTimeout(step, 600); });
     M.addEventListener('pointerdown', e => { e.preventDefault(); press(); });
     Game.G.panelKeys = e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); press(); } };
-    await UI.custom({ kicker: 'MIMLAB · terminal', title: 'The 2-back test', accent: 'red', node, onClose: () => { clearTimeout(timer); Game.G.panelKeys = null; } });
+    await UI.custom({ kicker: 'MIMLAB · terminal', title: L('The 2-back test', '2-back testi'), accent: 'red', node, onClose: () => { clearTimeout(timer); Game.G.panelKeys = null; } });
   };
   E.girvak = () => UI.panel('girvak');
   let spins = store.get('spins', 0);
   E.lottery = async () => {
-    const c = await choose(NAR, 'A lottery machine. Label: “GirVak odds simulator — 28 in 154,558.”', ['Spin it', 'Leave']);
+    const c = await choose(NAR, L('A lottery machine. Label: “GirVak odds simulator — 28 in 154,558.”', 'Bir piyango makinesi. Etiketi: “GirVak şans simülatörü — 154.558’de 28.”'), L(['Spin it', 'Leave'], ['Çevir', 'Boş ver']));
     if (c) return;
     spins++; store.set('spins', spins); SFX.coin();
-    if (spins < 4) await say(NAR, [`Ball #${(Math.random() * 154558 + 1) | 0}. Not selected.`, `(Odds: 0.018%. Spins so far: ${spins}.)`]);
-    else { await say(NAR, ['Ball #28. …Selected?!', 'Persistence noted. Fellowship granted.', '(That is not how it works. But it is how it felt.)']); secret('lottery'); spins = 0; store.set('spins', 0); }
+    const ball = (Math.random() * 154558 + 1) | 0;
+    if (spins < 4) await say(NAR, L([`Ball #${ball}. Not selected.`, `(Odds: 0.018%. Spins so far: ${spins}.)`], [`Top #${ball}. Seçilmedi.`, `(Şans: %0,018. Şu ana kadar çevirme sayısı: ${spins}.)`]));
+    else { await say(NAR, L(['Ball #28. …Selected?!', 'Persistence noted. Fellowship granted.', '(That is not how it works. But it is how it felt.)'], ['Top #28. …Seçildi mi?!', 'Azmin kayda geçti. Burs senin.', '(İşler böyle yürümüyor. Ama tam olarak böyle hissettirmişti.)'])); secret('lottery'); spins = 0; store.set('spins', 0); }
   };
   E.cay = async () => {
-    const c = await choose(SP.garson, 'Çay?', ['Evet, lütfen (yes please)', 'Hayır, teşekkürler (no thanks)']);
-    if (c === 1) await say(SP.garson, ['…', '(He brings you one anyway. That’s not rudeness. That’s hospitality with a mandate.)']);
-    else await say(SP.garson, ['Buyrun. Tavşan kanı — “rabbit’s blood”, the perfect colour.']);
+    const c = await choose(SP.garson, 'Çay?', L(['Evet, lütfen (yes please)', 'Hayır, teşekkürler (no thanks)'], ['Evet, lütfen', 'Hayır, teşekkürler']));
+    if (c === 1) await say(SP.garson, L(['…', '(He brings you one anyway. That’s not rudeness. That’s hospitality with a mandate.)'], ['…', '(Yine de bir tane getiriyor. Kabalıktan değil; burada misafirperverlik görev sayılıyor.)']));
+    else await say(SP.garson, L(['Buyrun. Tavşan kanı — “rabbit’s blood”, the perfect colour.'], ['Buyrun. Tavşan kanı, tam kıvamında.']));
     SFX.tea();
     P().boost = Game.t + 40;
     for (let i = 0; i < 6; i++) Game.particle({ x: P().x + (Math.random() - 0.5) * 6, y: P().y - 20, vy: -12 - Math.random() * 8, life: 1.2, kind: 'smoke', col: C.white });
-    await say(NAR, ['(You feel faster. Çay-powered. For about forty seconds.)']);
+    await say(NAR, L(['(You feel faster. Çay-powered. For about forty seconds.)'], ['(Kendini daha hızlı hissediyorsun. Çay gücüyle. Yaklaşık kırk saniyeliğine.)']));
     secret('cay');
   };
   E.simit = async () => {
-    if (P().carry) { await say(SP.simitci, ['Your hands are full, abi. Eat that first!']); return; }
-    await say(SP.simitci, ['SİMİT! Taze simit!', 'For you? On the house. Just… watch out for the seagulls. They have no shame.']);
+    if (P().carry) { await say(SP.simitci, L(['Your hands are full, abi. Eat that first!'], ['Elin dolu abi. Önce onu bitir!'])); return; }
+    await say(SP.simitci, L(['SİMİT! Taze simit!', 'For you? On the house. Just… watch out for the seagulls. They have no shame.'], ['SİMİT! Taze simit!', 'Sana mı? Benden olsun. Yalnız… martılara dikkat. Hiç utanmaları yok.']));
     P().carry = ICON.simit; P().carryKind = 'simit'; SFX.pop();
   };
-  E.stationInfo = () => say(NAR, ['İSTANBUL — Spike Train to London.', 'Departures: whenever a neuron feels like it. Arrivals: roughly Poisson.']);
-  E.stationInfoL = () => say(NAR, ['LONDON — Spike Train to İstanbul.', 'A note taped to the door: “Simit requests to the conductor, please.”']);
+  E.stationInfo = () => say(NAR, L(['İSTANBUL — Spike Train to London.', 'Departures: whenever a neuron feels like it. Arrivals: roughly Poisson.'], ['İSTANBUL — Londra’ya Spike Treni.', 'Kalkış: bir nöronun canı ne zaman isterse. Varış: aşağı yukarı Poisson.']));
+  E.stationInfoL = () => say(NAR, L(['LONDON — Spike Train to İstanbul.', 'A note taped to the door: “Simit requests to the conductor, please.”'], ['LONDRA — İstanbul’a Spike Treni.', 'Kapıya bantlanmış bir not: “Simit siparişleri için lütfen kondüktöre.”']));
   E.conductor = async () => {
-    const c = await choose(SP.conductor, 'All aboard the Spike Train! İstanbul → London, non-stop. Please mind the refractory period.', ['Board', 'Not yet']);
+    const c = await choose(SP.conductor, L('All aboard the Spike Train! İstanbul → London, non-stop. Please mind the refractory period.', 'Spike Treni kalkıyor, herkes yerine! İstanbul → Londra, aktarmasız. Lütfen refrakter döneme dikkat edin.'), L(['Board', 'Not yet'], ['Bin', 'Henüz değil']));
     if (c === 0) await ride(-1);
   };
   E.conductorL = async () => {
-    const c = await choose(SP.conductorL, 'Back to İstanbul? Lovely city. Bring me a simit.', ['Board', 'Not yet']);
+    const c = await choose(SP.conductorL, L('Back to İstanbul? Lovely city. Bring me a simit.', 'İstanbul’a dönüş mü? Ne güzel şehir. Bana bir simit getir.'), L(['Board', 'Not yet'], ['Bin', 'Henüz değil']));
     if (c === 0) await ride(1);
   };
   E.fish = async () => {
-    const c = await choose(SP.fisher, 'Rastgele! — that’s what we say here instead of “good luck”. Want to try?', ['Cast a line', 'Just watching']);
-    if (c) { await say(SP.fisher, ['Watching is half of fishing. The other half is lying about it later.']); return; }
+    const c = await choose(SP.fisher, L('Rastgele! — that’s what we say here instead of “good luck”. Want to try?', 'Rastgele! Sen de bir şansını denemek ister misin?'), L(['Cast a line', 'Just watching'], ['Olta at', 'Sadece izliyorum']));
+    if (c) { await say(SP.fisher, L(['Watching is half of fishing. The other half is lying about it later.'], ['İzlemek balıkçılığın yarısıdır. Öbür yarısı da sonradan bu konuda yalan söylemek.'])); return; }
     UI.endDlg(); Game.lock();
     const bx = P().x - 26, by = P().y + 4;
     const bob = { x: bx, y: by, sortY: by, draw(g, cx, cy) { const k = Math.sin(Game.t * 6) > 0.6 ? 1 : 0; rect(g, bx - 1 - cx, by - cy + k, 3, 2, C.r2); px(g, bx - cx, by - 1 - cy + k, C.white); } };
@@ -534,12 +556,12 @@ const Eggs = (() => {
     await Game.wait(1.6 + Math.random() * 1.6);
     SFX.splash(); bob.hidden = true; Game.burst(bx, by, 8, [C.w5, C.white], 25); Game.unlock();
     const [what, line2] = pick(CATCHES);
-    await say(NAR, [`You caught ${what}!`, line2]);
+    await say(NAR, L([`You caught ${what}!`, line2], [`${what} yakaladın!`, line2]));
     secret('fish');
   };
   E.row = async () => {
     const onIsland = P().x < 37 * 16 && P().y < 20 * 16;
-    const c = await choose(NAR, onIsland ? 'Row back to the İstanbul pier?' : 'A little rowboat. The oars look borrowed. Row out to the island in the Channel?', ['Row', 'Stay']);
+    const c = await choose(NAR, onIsland ? L('Row back to the İstanbul pier?', 'İstanbul iskelesine kürek çekip dönelim mi?') : L('A little rowboat. The oars look borrowed. Row out to the island in the Channel?', 'Küçük bir sandal. Kürekler ödünç alınmış gibi. Manş Denizi’ndeki adaya kürek çekelim mi?'), L(['Row', 'Stay'], ['Kürek çek', 'Kal']));
     if (c) return;
     UI.endDlg(); Game.lock(); await Game.fade(true);
     if (onIsland) { P().x = 582; P().y = 736; } else { P().x = 534; P().y = 202; }
@@ -547,27 +569,28 @@ const Eggs = (() => {
     await Game.wait(0.4); await Game.fade(false); Game.unlock();
   };
   E.bottle = async () => {
-    await say(NAR, ['A message in a bottle. The handwriting is neat, the ink a little smudged.']);
-    await say({ name: 'THE NOTE', color: 'var(--teal)', voice: 3 }, ['“If you found this, you’re thorough. I like thorough.', 'Write to me — artun.balta@outlook.com — and mention the bottle. I’ll know what it means.', '— A.”']);
+    await say(NAR, L(['A message in a bottle. The handwriting is neat, the ink a little smudged.'], ['Şişede bir mesaj. El yazısı düzgün, mürekkep biraz dağılmış.']));
+    await say({ name: L('THE NOTE', 'NOT'), color: 'var(--teal)', voice: 3 }, L(['“If you found this, you’re thorough. I like thorough.', 'Write to me — artun.balta@outlook.com — and mention the bottle. I’ll know what it means.', '— A.”'], ['“Bunu bulduysan titizsin. Titiz insanları severim.', 'Bana yaz — artun.balta@outlook.com — ve şişeden bahset. Ne demek istediğini anlarım.', '— A.”']));
     secret('island');
   };
-  E.lighthouse = () => say(NAR, ['The lighthouse keeper’s log, last entry: “Nothing happened today. Again. Excellent.”']);
+  E.lighthouse = () => say(NAR, L(['The lighthouse keeper’s log, last entry: “Nothing happened today. Again. Excellent.”'], ['Deniz feneri bekçisinin günlüğü, son kayıt: “Bugün hiçbir şey olmadı. Yine. Harika.”']));
 
   /* ================= London ================= */
-  E.queensTower = () => say(NAR, ['The Queen’s Tower — the last standing piece of the old Imperial Institute. There are bells up there.', 'They ring on royal occasions. Not on request. Artun asked.']);
-  E.imperial = async () => { await say(NAR, ['Imperial College. Somewhere inside, a single neuron is being listened to very carefully.']); await UI.panel('imperial'); };
+  E.queensTower = () => say(NAR, L(['The Queen’s Tower — the last standing piece of the old Imperial Institute. There are bells up there.', 'They ring on royal occasions. Not on request. Artun asked.'], ['Queen’s Tower: eski Imperial Institute’tan ayakta kalan son parça. Tepesinde çanlar var.', 'Kraliyet günlerinde çalarlar. İstek üzerine değil. Artun sordu.']));
+  E.imperial = async () => { await say(NAR, L(['Imperial College. Somewhere inside, a single neuron is being listened to very carefully.'], ['Imperial College. İçeride bir yerde, tek bir nöron çok dikkatle dinleniyor.'])); await UI.panel('imperial'); };
   E.partyTalk = async (it) => {
     const i = it.ent.partyIndex;
-    await say({ name: 'GUEST', color: 'var(--violet)', voice: 1 + i, portrait: portraitOf(it.ent.frames) }, [PARTY[i].say]);
-    await say(NAR, ['(Notice how the other voices turn to mush when you focus on one? That’s the cocktail party effect — and decoding which voice a brain is attending to is exactly Artun’s thesis.)']);
+    await say({ name: L('GUEST', 'DAVETLİ'), color: 'var(--violet)', voice: 1 + i, portrait: portraitOf(it.ent.frames) }, [PARTY[i].say]);
+    await say(NAR, L(['(Notice how the other voices turn to mush when you focus on one? That’s the cocktail party effect — and decoding which voice a brain is attending to is exactly Artun’s thesis.)'], ['(Birine odaklanınca öbür seslerin lapaya döndüğünü fark ettin mi? Buna kokteyl partisi etkisi deniyor. Bir beynin hangi sese kulak verdiğini çözmek de tam olarak Artun’un tezi.)']));
     secret('party');
   };
   E.clock = async () => {
     const t = londonTime(), hh = String(t.h).padStart(2, '0'), mm = String(t.m).padStart(2, '0');
     SFX.chime();
     const h = t.h;
-    const doing = h < 6 ? 'asleep. Or spike-sorting. From the outside, it looks the same.' : h < 9 ? 'on the Tube, pretending to read a paper.' : h < 12 ? 'in the lab, fitting receptive fields.' : h < 14 ? 'at lunch, quietly missing a proper Turkish breakfast.' : h < 18 ? 'arguing with a Poisson likelihood. The likelihood is winning.' : h < 21 ? 'at an open mic. Or explaining neuroscience to someone who asked a simple question.' : 'winding a mechanical watch and calling it “self-care”.';
-    await say(NAR, [`*Westminster chimes*`, `It is ${hh}:${mm} in London. Really — this clock is live.`, `So Artun is probably ${doing}`]);
+    const doing = L(h < 6 ? 'asleep. Or spike-sorting. From the outside, it looks the same.' : h < 9 ? 'on the Tube, pretending to read a paper.' : h < 12 ? 'in the lab, fitting receptive fields.' : h < 14 ? 'at lunch, quietly missing a proper Turkish breakfast.' : h < 18 ? 'arguing with a Poisson likelihood. The likelihood is winning.' : h < 21 ? 'at an open mic. Or explaining neuroscience to someone who asked a simple question.' : 'winding a mechanical watch and calling it “self-care”.',
+      h < 6 ? 'uyuyor. Ya da spike ayıklıyor. Dışarıdan bakınca ikisi aynı.' : h < 9 ? 'metroda, makale okuyormuş gibi yapıyor.' : h < 12 ? 'laboratuvarda, alıcı alan modelleri oturtuyor.' : h < 14 ? 'öğle yemeğinde, sessizce düzgün bir Türk kahvaltısını özlüyor.' : h < 18 ? 'bir Poisson olabilirliğiyle tartışıyor. Olabilirlik kazanıyor.' : h < 21 ? 'bir açık mikrofon gecesinde. Ya da basit bir soru soran birine nörobilim anlatıyor.' : 'mekanik bir saati kuruyor ve buna “öz bakım” diyor.');
+    await say(NAR, L([`*Westminster chimes*`, `It is ${hh}:${mm} in London. Really — this clock is live.`, `So Artun is probably ${doing}`], [`*Westminster çanları*`, `Londra’da saat ${hh}:${mm}. Gerçekten, bu saat canlı.`, `Yani Artun muhtemelen ${doing}`]));
     secret('chime');
   };
   E.drawClock = (g, x, y, r, tz) => {
@@ -580,72 +603,72 @@ const Eggs = (() => {
     px(g, Math.round(x - 0.5), Math.round(y - 0.5), C.y1);
   };
   E.watchShop = async () => {
-    await say(NAR, ['Every watch in the window says 10:10.']);
+    await say(NAR, L(['Every watch in the window says 10:10.'], ['Vitrindeki bütün saatler 10:10’u gösteriyor.']));
     secret('tenten');
     await UI.panel('watches');
   };
   E.phone = async () => {
     E.phoneAnswered = true;
-    const c = await choose(NAR, 'The red phone box is ringing. It has been ringing since you got to London.', ['Pick up', 'Let it ring']);
-    if (c) { E.phoneAnswered = false; await say(NAR, ['It keeps ringing. Patiently. Persistently. Professionally.']); return; }
+    const c = await choose(NAR, L('The red phone box is ringing. It has been ringing since you got to London.', 'Kırmızı telefon kulübesi çalıyor. Londra’ya geldiğinden beri çalıyor.'), L(['Pick up', 'Let it ring'], ['Aç', 'Çalsın']));
+    if (c) { E.phoneAnswered = false; await say(NAR, L(['It keeps ringing. Patiently. Persistently. Professionally.'], ['Çalmaya devam ediyor. Sabırla. Israrla. Profesyonelce.'])); return; }
     const V = SP.voli;
-    await say(V, ['Hi! It’s Voli, calling from volina. on behalf of a dental clinic in İstanbul.', 'You asked about a smile makeover a while ago — is now a good time?']);
-    const a = await choose(V, 'How can I help?', ['Who is this?', 'I’m not interested.', 'How did you get this number?!']);
-    if (a === 0) await say(V, ['I’m Voli, an AI voice agent! I call people who once asked about treatment and then went quiet.', 'I listen to how you talk, and adapt my tone and pacing as we go. Right now you sound… curious. I like that.']);
+    await say(V, L(['Hi! It’s Voli, calling from volina. on behalf of a dental clinic in İstanbul.', 'You asked about a smile makeover a while ago — is now a good time?'], ['Merhaba! Ben Voli, İstanbul’daki bir diş kliniği adına volina.’dan arıyorum.', 'Bir süre önce gülüş tasarımını sormuştunuz. Şu an konuşmak için uygun musunuz?']));
+    const a = await choose(V, L('How can I help?', 'Size nasıl yardımcı olabilirim?'), L(['Who is this?', 'I’m not interested.', 'How did you get this number?!'], ['Kimsiniz?', 'İlgilenmiyorum.', 'Bu numarayı nereden buldunuz?!']));
+    if (a === 0) await say(V, L(['I’m Voli, an AI voice agent! I call people who once asked about treatment and then went quiet.', 'I listen to how you talk, and adapt my tone and pacing as we go. Right now you sound… curious. I like that.'], ['Ben Voli, yapay zekâlı bir sesli asistanım! Bir zamanlar tedavi sorup sonra sessizleşen insanları arıyorum.', 'Nasıl konuştuğunuzu dinliyor, tonumu ve temposumu konuşurken ayarlıyorum. Şu an sesiniz… meraklı geliyor. Bunu sevdim.']));
     if (a === 1) {
-      await say(V, ['Totally understand. Most people say that right before their free consultation.']);
-      const b = await choose(V, 'Would Tuesday or Thursday suit you better?', ['Neither!', 'Thursday, I guess']);
-      await say(V, b === 0 ? ['Noted: “neither”. Adjusting tone to “gently persistent”. Objection handled — I’ll stop here.'] : ['Wonderful! Thursday it is. (That’s a conversion. Somewhere, a dashboard just went up by 0.01%.)']);
+      await say(V, L(['Totally understand. Most people say that right before their free consultation.'], ['Çok anlaşılır. Çoğu kişi bunu ücretsiz muayenesinden hemen önce söyler.']));
+      const b = await choose(V, L('Would Tuesday or Thursday suit you better?', 'Salı mı daha uygun olur, perşembe mi?'), L(['Neither!', 'Thursday, I guess'], ['İkisi de değil!', 'Perşembe olsun bari']));
+      await say(V, b === 0 ? L(['Noted: “neither”. Adjusting tone to “gently persistent”. Objection handled — I’ll stop here.'], ['Not aldım: “ikisi de değil”. Tonu “nazikçe ısrarcı”ya ayarlıyorum. İtiraz karşılandı, burada bırakıyorum.']) : L(['Wonderful! Thursday it is. (That’s a conversion. Somewhere, a dashboard just went up by 0.01%.)'], ['Harika! Perşembe o zaman. (Bu bir dönüşüm. Bir yerlerde bir panel az önce %0,01 yükseldi.)']));
     }
-    if (a === 2) await say(V, ['You filled in a form — with consent! Logged, timestamped, KVKK- and GDPR-compliant.', 'Honestly, it’s my favourite part of me.']);
-    await say(V, ['Have a lovely day! Follow-ups that follow through — that’s our whole thing.', 'Your teeth look great, by the way. (I can’t see them. I’m a phone.)']);
-    await say(NAR, ['(That’s roughly what volina. does: real-time caller profiling, adaptive tone, objection handling. Five clinic pilots, ~40,000 leads.)']);
+    if (a === 2) await say(V, L(['You filled in a form — with consent! Logged, timestamped, KVKK- and GDPR-compliant.', 'Honestly, it’s my favourite part of me.'], ['Bir form doldurmuştunuz, onay vererek! Kayıtlı, zaman damgalı, KVKK ve GDPR uyumlu.', 'Açıkçası, kendimde en sevdiğim kısım bu.']));
+    await say(V, L(['Have a lovely day! Follow-ups that follow through — that’s our whole thing.', 'Your teeth look great, by the way. (I can’t see them. I’m a phone.)'], ['İyi günler dilerim! Takibi sonuna kadar takip etmek, bütün işimiz bu.', 'Bu arada dişleriniz harika görünüyor. (Göremiyorum. Ben bir telefonum.)']));
+    await say(NAR, L(['(That’s roughly what volina. does: real-time caller profiling, adaptive tone, objection handling. Five clinic pilots, ~40,000 leads.)'], ['(volina. kabaca bunu yapıyor: arayanın gerçek zamanlı profilini çıkarıyor, tonunu uyarlıyor, itirazları karşılıyor. Beş klinik pilotu, ~40.000 potansiyel hasta.)']));
     secret('volina');
   };
   E.post = async () => {
-    const c = await choose(NAR, 'A red pillar box. Post a letter to Artun?', ['Write a letter (opens email)', 'Not now']);
-    if (c === 0) window.location.href = `mailto:${ME.email}?subject=${encodeURIComponent('A letter from the pixel world')}`;
+    const c = await choose(NAR, L('A red pillar box. Post a letter to Artun?', 'Kırmızı bir posta kutusu. Artun’a bir mektup atalım mı?'), L(['Write a letter (opens email)', 'Not now'], ['Mektup yaz (e-posta açılır)', 'Şimdi değil']));
+    if (c === 0) window.location.href = `mailto:${ME.email}?subject=${encodeURIComponent(L('A letter from the pixel world', 'Piksel dünyadan bir mektup'))}`;
   };
   E.drawBulbs = (g, x, y, b, t) => {
     const k = Math.floor(t * 6);
     (b.c.bulbs || []).forEach(([bx, by], i) => { const on = (i + k) % 3 !== 0; px(g, x + bx, y + by, on ? C.y4 : C.y0); if (on) px(g, x + bx, y + by - 1, 'rgba(250,219,116,.35)'); });
   };
-  E.comedyClub = async () => { await say(NAR, ['THE REFRACTORY PERIOD — comedy every night. (In neurons, the refractory period is the pause after firing when you can’t fire again. In comedy, it’s the silence after a joke bombs.)']); await UI.panel('comedy'); };
+  E.comedyClub = async () => { await say(NAR, L(['THE REFRACTORY PERIOD — comedy every night. (In neurons, the refractory period is the pause after firing when you can’t fire again. In comedy, it’s the silence after a joke bombs.)'], ['THE REFRACTORY PERIOD (Refrakter Dönem): her gece komedi. (Nöronlarda refrakter dönem, ateşledikten sonra bir daha ateşleyemediğin kısa moladır. Komedide ise patlamayan bir esprinin ardından gelen sessizlik.)'])); await UI.panel('comedy'); };
   let jokeI = store.get('jokeI', 0), jokesHeard = 0;
   E.comedy = async () => {
     const j = JOKES[jokeI % JOKES.length]; jokeI++; store.set('jokeI', jokeI); jokesHeard++;
     await say(SP.comic, [j]);
     if (Math.random() < 0.72) { SFX.rimshot(); setTimeout(() => SFX.laugh(), 700); Game.particle({ x: 10 * 16, y: 25 * 16, vy: -14, life: 1.4, kind: 'text', text: 'HA HA', col: C.y3 }); }
-    else { SFX.crickets(); await say(NAR, ['(crickets)']); }
-    if (jokesHeard >= 5) { await say(SP.comic, ['That’s my time — you’ve been great! Tip your bartender, cite your sources.']); secret('comedy'); jokesHeard = 0; }
+    else { SFX.crickets(); await say(NAR, L(['(crickets)'], ['(cır cır böcekleri)'])); }
+    if (jokesHeard >= 5) { await say(SP.comic, L(['That’s my time — you’ve been great! Tip your bartender, cite your sources.'], ['Benden bu kadar, harika seyircisiniz! Barmene bahşiş, kaynaklarınıza atıf.'])); secret('comedy'); jokesHeard = 0; }
   };
   E.tearoom = async () => {
-    const c = await choose(SP.tea, 'Tea, love? With milk?', ['Yes, milk please', 'No milk, thank you', 'Do you have tulip glasses?']);
-    if (c === 0) { SFX.tea(); await say(NAR, ['You sip a very proper cup of tea.', '(Somewhere in Ankara, a tulip glass quietly shatters.)']); secret('milktea'); }
-    else if (c === 1) await say(SP.tea, ['A purist! Your friend Artun is the same. Stares at the milk jug like it insulted his family.']);
-    else await say(SP.tea, ['Tulip what, dear?']);
+    const c = await choose(SP.tea, L('Tea, love? With milk?', 'Çay, canım? Sütlü mü olsun?'), L(['Yes, milk please', 'No milk, thank you', 'Do you have tulip glasses?'], ['Evet, sütlü lütfen', 'Sütsüz, teşekkürler', 'İnce belli bardağınız var mı?']));
+    if (c === 0) { SFX.tea(); await say(NAR, L(['You sip a very proper cup of tea.', '(Somewhere in Ankara, a tulip glass quietly shatters.)'], ['Son derece usulüne uygun bir fincan çay yudumluyorsun.', '(Ankara’da bir yerde, ince belli bir bardak sessizce çatlıyor.)'])); secret('milktea'); }
+    else if (c === 1) await say(SP.tea, L(['A purist! Your friend Artun is the same. Stares at the milk jug like it insulted his family.'], ['Bir purist! Arkadaşın Artun da öyle. Süt kabına, ailesine laf etmiş gibi bakıyor.']));
+    else await say(SP.tea, L(['Tulip what, dear?'], ['İnce belli ne, şekerim?']));
   };
-  E.bus = () => say(NAR, ['Route 10 → IMPERIAL. Next bus: due in 2 minutes, for the last 20 minutes.']);
+  E.bus = () => say(NAR, L(['Route 10 → IMPERIAL. Next bus: due in 2 minutes, for the last 20 minutes.'], ['10 numara → IMPERIAL. Sonraki otobüs: 20 dakikadır “2 dakikaya” geliyor.']));
   E.umbrella = async () => {
     const p = P();
-    if (p.umbrella) { p.umbrella = false; await say(NAR, ['You return the umbrella. Brave.']); return; }
+    if (p.umbrella) { p.umbrella = false; await say(NAR, L(['You return the umbrella. Brave.'], ['Şemsiyeyi geri veriyorsun. Cesurca.'])); return; }
     p.umbrella = true; SFX.pop();
-    await say(NAR, ['You borrow an umbrella. It’s London. Nobody will ever ask for it back.']);
+    await say(NAR, L(['You borrow an umbrella. It’s London. Nobody will ever ask for it back.'], ['Bir şemsiye ödünç alıyorsun. Burası Londra. Kimse onu geri istemeyecek.']));
   };
   E.horsesInfo = () => UI.panel('horses');
 
   /* ---------- the race ---------- */
   const HORSES = [
-    { name: 'Prior Knowledge', p: 0.38, coat: C.k2, coatD: C.k1, silk: C.r2 },
-    { name: 'Gradient Descent', p: 0.27, coat: C.ink2, coatD: C.ink, silk: C.b2 },
-    { name: 'Overfit', p: 0.21, coat: C.t4, coatD: C.t2, silk: C.y2 },
-    { name: 'Null Hypothesis', p: 0.14, coat: C.k3, coatD: C.k2, silk: C.g3 },
+    { name: L('Prior Knowledge', 'Önsel Bilgi'), p: 0.38, coat: C.k2, coatD: C.k1, silk: C.r2 },
+    { name: L('Gradient Descent', 'Gradyan İnişi'), p: 0.27, coat: C.ink2, coatD: C.ink, silk: C.b2 },
+    { name: L('Overfit', 'Aşırı Uyum'), p: 0.21, coat: C.t4, coatD: C.t2, silk: C.y2 },
+    { name: L('Null Hypothesis', 'Sıfır Hipotezi'), p: 0.14, coat: C.k3, coatD: C.k2, silk: C.g3 },
   ];
   const R = { cx: 14 * 16, cy: 49.6 * 16, rx: 9.1 * 16, ry: 4.4 * 16, running: false };
   E.bookie = async () => {
     if (R.running) return;
-    const c = await choose(SP.bookie, 'Fancy a flutter? My form model gives each horse a probability. The horses haven’t read it.',
-      HORSES.map(h => `${h.name} · ${Math.round(h.p * 100)}%`).concat(['No thanks']));
+    const c = await choose(SP.bookie, L('Fancy a flutter? My form model gives each horse a probability. The horses haven’t read it.', 'Küçük bir bahse ne dersin? Form modelim her ata bir olasılık veriyor. Atlar modeli okumadı.'),
+      HORSES.map(h => L(`${h.name} · ${Math.round(h.p * 100)}%`, `${h.name} · %${Math.round(h.p * 100)}`)).concat([L('No thanks', 'Kalsın')]));
     if (c === 4) return;
     await race(c);
   };
@@ -665,8 +688,8 @@ const Eggs = (() => {
     R.running = false; R.done = Game.t;
     Game.G.camFocus = null; Game.unlock();
     const w = HORSES[win], mine = HORSES[pickI];
-    if (win === pickI) { await say(SP.bookie, [`${w.name} wins! You picked it.`, `The model gave it ${Math.round(w.p * 100)}%. You either trusted the model or got lucky. Same thing, statistically.`]); secret('race'); }
-    else await say(SP.bookie, [`${w.name} wins. Your horse, ${mine.name}, had ${Math.round(mine.p * 100)}% — and ${Math.round(mine.p * 100)}% is not a promise.`, 'Probability is just confidence with a calculator. Again?']);
+    if (win === pickI) { await say(SP.bookie, L([`${w.name} wins! You picked it.`, `The model gave it ${Math.round(w.p * 100)}%. You either trusted the model or got lucky. Same thing, statistically.`], [`${w.name} kazandı! Sen de onu seçmiştin.`, `Model ona %${Math.round(w.p * 100)} vermişti. Ya modele güvendin ya da şanslıydın. İstatistiksel olarak aynı şey.`])); secret('race'); }
+    else await say(SP.bookie, L([`${w.name} wins. Your horse, ${mine.name}, had ${Math.round(mine.p * 100)}% — and ${Math.round(mine.p * 100)}% is not a promise.`, 'Probability is just confidence with a calculator. Again?'], [`${w.name} kazandı. Senin atın ${mine.name}, %${Math.round(mine.p * 100)} şansa sahipti. Ve %${Math.round(mine.p * 100)} bir söz değildir.`, 'Olasılık dediğin, hesap makinesi taşıyan bir özgüvendir. Bir daha?']));
   }
   function horsePos(i, k) {
     const lane = [-13, -4.5, 4.5, 13][i];
@@ -699,7 +722,7 @@ const Eggs = (() => {
     Game.G.camFocus = { x: TR.front - dir * 60, y: TR.y - 20 };
     await Game.wait(0.3); await Game.fade(false);
     SFX.whistle();
-    UI.toast(dir < 0 ? 'Next stop: <b>London</b>. Please mind the refractory period.' : 'Next stop: <b>İstanbul</b>. Simit service in the buffet car.', 5200);
+    UI.toast(dir < 0 ? L('Next stop: <b>London</b>. Please mind the refractory period.', 'Sonraki durak: <b>Londra</b>. Lütfen refrakter döneme dikkat edin.') : L('Next stop: <b>İstanbul</b>. Simit service in the buffet car.', 'Sonraki durak: <b>İstanbul</b>. Yemekli vagonda simit servisi var.'), 5200);
     await Game.wait(0.9);
     TR.state = 'run'; TR.v = 0;
     await new Promise(res => { TR.onArrive = res; });
@@ -710,7 +733,7 @@ const Eggs = (() => {
     p.hidden = false;
     Game.G.camFocus = null; Game.unlock();
     SFX.pop();
-    if (secret('train')) setTimeout(() => UI.toast(dir < 0 ? 'Welcome to London. It’s raining. It’s fine.' : 'Back in İstanbul. Someone is selling simit.'), 3600);
+    if (secret('train')) setTimeout(() => UI.toast(dir < 0 ? L('Welcome to London. It’s raining. It’s fine.', 'Londra’ya hoş geldin. Yağmur yağıyor. Sorun yok.') : L('Back in İstanbul. Someone is selling simit.', 'İstanbul’a döndün. Birisi simit satıyor.')), 3600);
   }
   function trainUpdate(dt) {
     if (TR.state === 'run') {
@@ -809,7 +832,7 @@ const Eggs = (() => {
       }
       if (this.thief) {
         const th = this.thief; th.t += dt;
-        if (!th.got) { th.x += (p.x - th.x) * Math.min(1, dt * 4); th.y += (p.y - 22 - th.y) * Math.min(1, dt * 4); if (Math.hypot(p.x - th.x, p.y - 22 - th.y) < 6) { th.got = true; p.carry = null; SFX.gull(); Game.G.shake = 2; if (E.follower && !E.follower.hidden) Game.bubble(E.follower, 'HAV! HAV!', 1600); setTimeout(async () => { await UI.say(NAR, [`A seagull just stole your ${th.kind}. Mid-air. No eye contact.`, E.follower ? 'Paşa barked heroically. The seagull did not care.' : 'Locals call this the İstanbul tax.']); UI.endDlg(); secret('gull'); }, 300); } }
+        if (!th.got) { th.x += (p.x - th.x) * Math.min(1, dt * 4); th.y += (p.y - 22 - th.y) * Math.min(1, dt * 4); if (Math.hypot(p.x - th.x, p.y - 22 - th.y) < 6) { th.got = true; p.carry = null; SFX.gull(); Game.G.shake = 2; if (E.follower && !E.follower.hidden) Game.bubble(E.follower, 'HAV! HAV!', 1600); setTimeout(async () => { await UI.say(NAR, L([`A seagull just stole your ${th.kind}. Mid-air. No eye contact.`, E.follower ? 'Paşa barked heroically. The seagull did not care.' : 'Locals call this the İstanbul tax.'], [`Bir martı az önce elindekini kaptı: ${th.kind}! Havada. Göz teması bile kurmadan.`, E.follower ? 'Paşa kahramanca havladı. Martının umurunda bile olmadı.' : 'Buralılar buna İstanbul vergisi diyor.'])); UI.endDlg(); secret('gull'); }, 300); } }
         else { th.x += 70 * dt; th.y -= 60 * dt; if (th.t > 6) this.thief = null; }
       }
     }
@@ -884,23 +907,27 @@ const Eggs = (() => {
   E.mentor = async () => {
     const pc = canvas(16, 15); pc.g.drawImage(mentorObj.img, -1, 0);
     const f = MENTOR_FACTS[factI % MENTOR_FACTS.length]; factI++; store.set('factI', factI);
-    await say({ name: 'YOUR MENTOR', color: 'var(--gold)', voice: 4, portrait: pc }, ['Did you know? ' + f, pick(['(One short clip. That’s the whole lesson.)', '(Curious? Ask me again.)', '(No quiz. Promise.)'])]);
+    await say({ name: L('YOUR MENTOR', 'MENTORUN'), color: 'var(--gold)', voice: 4, portrait: pc }, L(['Did you know? ' + f, pick(['(One short clip. That’s the whole lesson.)', '(Curious? Ask me again.)', '(No quiz. Promise.)'])], ['Biliyor muydun? ' + f, pick(['(Kısacık bir klip. Bütün ders bu.)', '(Merak mı ettin? Bana yine sor.)', '(Sınav yok. Söz.)'])]));
   };
   E.scrollio = async () => {
-    const c = await choose(NAR, 'A phone the size of a person. The feed on it is… educational? A sticker: “Scrollio — turn scrolling into learning.”', ['Draw a mentor', 'What is Scrollio?', 'Leave']);
+    const c = await choose(NAR, L('A phone the size of a person. The feed on it is… educational? A sticker: “Scrollio — turn scrolling into learning.”', 'İnsan boyunda bir telefon. Ekrandaki akış… eğitici mi? Bir çıkartma: “Scrollio — kaydırmayı öğrenmeye dönüştür.”'), L(['Draw a mentor', 'What is Scrollio?', 'Leave'], ['Bir mentor çiz', 'Scrollio nedir?', 'Boş ver']));
     if (c === 1) return UI.panel('scrollio');
     if (c === 2) return;
     const data = new Uint8Array(256);
     if (mentorObj) data.set(mentorObj.data);
-    const node = html(`<p class="lead">In Scrollio Kids, drawing is the first interface: a child draws a mentor, and the drawing becomes one. Draw yours — it will move in next to the phone.</p>
+    const node = html(L(`<p class="lead">In Scrollio Kids, drawing is the first interface: a child draws a mentor, and the drawing becomes one. Draw yours — it will move in next to the phone.</p>
       <div class="drawpad"><canvas width="16" height="16"></canvas><div class="pal"></div></div>
       <p class="mriNote" data-msg>Tip: big shapes and two eyes go a long way.</p>
-      <div class="row"><button class="btn ghost" data-clear>Clear</button><button class="btn" data-make>Create mentor ▸</button></div>`);
+      <div class="row"><button class="btn ghost" data-clear>Clear</button><button class="btn" data-make>Create mentor ▸</button></div>`,
+      `<p class="lead">Scrollio Kids’te ilk arayüz çizim: çocuk bir mentor çiziyor ve çizim mentora dönüşüyor. Sen de kendininkini çiz; telefonun yanına taşınacak.</p>
+      <div class="drawpad"><canvas width="16" height="16"></canvas><div class="pal"></div></div>
+      <p class="mriNote" data-msg>İpucu: büyük şekiller ve iki göz çok iş görür.</p>
+      <div class="row"><button class="btn ghost" data-clear>Temizle</button><button class="btn" data-make>Mentoru yarat ▸</button></div>`));
     const pad = node.querySelector('canvas'), pg = pad.getContext('2d'), palEl = node.querySelector('.pal'), msg = node.querySelector('[data-msg]');
     let cur = 1;
     const paint = () => { pg.clearRect(0, 0, 16, 16); for (let i = 0; i < 256; i++) { const x = i % 16, y = (i / 16) | 0; pg.fillStyle = data[i] ? MPAL[data[i]] : ((x + y) & 1 ? '#efe4c8' : '#e4d1ac'); pg.fillRect(x, y, 1, 1); } };
     MPAL.forEach((col, i) => {
-      const b = document.createElement('button'); b.className = 'sw' + (i === cur ? ' on' : ''); b.title = i ? 'colour' : 'eraser';
+      const b = document.createElement('button'); b.className = 'sw' + (i === cur ? ' on' : ''); b.title = i ? L('colour', 'renk') : L('eraser', 'silgi');
       b.style.background = col || 'repeating-linear-gradient(45deg,#f6ead0 0 4px,#c6ad8c 4px 8px)';
       b.addEventListener('click', () => { cur = i; palEl.querySelectorAll('.sw').forEach((e, k) => e.classList.toggle('on', k === cur)); });
       palEl.appendChild(b);
@@ -913,30 +940,31 @@ const Eggs = (() => {
     node.querySelector('[data-clear]').addEventListener('click', () => { data.fill(0); paint(); });
     node.querySelector('[data-make]').addEventListener('click', () => {
       const n = data.reduce((a, v) => a + (v ? 1 : 0), 0);
-      if (n < 10) { msg.textContent = 'A few more pixels — mentors need at least a little body.'; return; }
+      if (n < 10) { msg.textContent = L('A few more pixels — mentors need at least a little body.', 'Birkaç piksel daha. Mentorların biraz da olsa gövdesi olmalı.'); return; }
       spawnMentor(data); store.set('mentor', Array.from(data)); SFX.secret();
       UI.closePanel();
-      setTimeout(async () => { Game.burst(82.4 * 16, 11.6 * 16, 16, [C.y3, C.white, C.p2], 40); await say(NAR, ['Your drawing blinks, stretches, and steps off the screen.', 'It’s standing next to the phone now. Ask it something.']); UI.endDlg(); secret('mentor'); }, 250);
+      setTimeout(async () => { Game.burst(82.4 * 16, 11.6 * 16, 16, [C.y3, C.white, C.p2], 40); await say(NAR, L(['Your drawing blinks, stretches, and steps off the screen.', 'It’s standing next to the phone now. Ask it something.'], ['Çizimin göz kırpıyor, gerinip ekrandan dışarı adım atıyor.', 'Artık telefonun yanında duruyor. Ona bir şey sor.'])); UI.endDlg(); secret('mentor'); }, 250);
     });
     paint();
-    await UI.custom({ kicker: 'School Hill · Scrollio Kids', title: 'Draw a mentor', accent: 'gold', node });
+    await UI.custom({ kicker: L('School Hill · Scrollio Kids', 'Okul Tepesi · Scrollio Kids'), title: L('Draw a mentor', 'Bir mentor çiz'), accent: 'gold', node });
   };
 
   /* ================= echo: a world that learns you ================= */
   // a toy version of the idea: every thing you do updates a Bayesian posterior over who you are
-  const ARCH = ['Explorer', 'Completionist', 'Reader', 'Socialite', 'Recruiter'];
-  const ARCH_NOTE = ['walks first, reads later', 'will find all of them. has already started', 'opens every door, reads every sign', 'talks to everyone, pets every dog', 'opened the CV. respect'];
+  const ARCH = L(['Explorer', 'Completionist', 'Reader', 'Socialite', 'Recruiter'], ['Kâşif', 'Tamamlamacı', 'Okur', 'Sosyal Kelebek', 'İşe Alımcı']);
+  const ARCH_NOTE = L(['walks first, reads later', 'will find all of them. has already started', 'opens every door, reads every sign', 'talks to everyone, pets every dog', 'opened the CV. respect'], ['önce yürür, sonra okur', 'hepsini bulacak. çoktan başladı bile', 'her kapıyı açar, her tabelayı okur', 'herkesle konuşur, her köpeği sever', 'CV’yi açtı. saygılar']);
   const LIKE = {
     zone: [0.40, 0.22, 0.10, 0.14, 0.14], walk: [0.36, 0.22, 0.12, 0.18, 0.12], talk: [0.12, 0.18, 0.10, 0.48, 0.12],
     read: [0.08, 0.14, 0.46, 0.06, 0.26], play: [0.20, 0.36, 0.06, 0.26, 0.12], pet: [0.14, 0.16, 0.06, 0.58, 0.06],
     secret: [0.18, 0.56, 0.06, 0.12, 0.08], cv: [0.04, 0.06, 0.20, 0.04, 0.66], travel: [0.10, 0.26, 0.12, 0.08, 0.44],
     idle: [0.08, 0.10, 0.40, 0.30, 0.12], run: [0.26, 0.24, 0.04, 0.06, 0.40],
   };
-  const VERB = { zone: 'wander somewhere new', talk: 'talk to someone', read: 'read something', play: 'poke a machine', pet: 'pet Paşa', secret: 'find a secret', cv: 'open the CV', travel: 'fast-travel' };
+  const VERB = L({ zone: 'wander somewhere new', talk: 'talk to someone', read: 'read something', play: 'poke a machine', pet: 'pet Paşa', secret: 'find a secret', cv: 'open the CV', travel: 'fast-travel' },
+    { zone: 'yeni bir yere gitmek', talk: 'biriyle konuşmak', read: 'bir şey okumak', play: 'bir makineyi kurcalamak', pet: 'Paşa’yı sevmek', secret: 'bir sır bulmak', cv: 'CV’yi açmak', travel: 'hızlı seyahat' });
   const ECHO = { logp: ARCH.map(() => 0), n: 0, counts: {} };
   E.observe = (type) => {
-    const L = LIKE[type]; if (!L) return;
-    for (let i = 0; i < ARCH.length; i++) ECHO.logp[i] += 0.5 * Math.log(L[i] * ARCH.length);
+    const lk = LIKE[type]; if (!lk) return;
+    for (let i = 0; i < ARCH.length; i++) ECHO.logp[i] += 0.5 * Math.log(lk[i] * ARCH.length);
     ECHO.n++; ECHO.counts[type] = (ECHO.counts[type] || 0) + 1;
   };
   function posterior() { const m = Math.max(...ECHO.logp), e = ECHO.logp.map(v => Math.exp(v - m)), z = e.reduce((a, b) => a + b, 0); return e.map(v => v / z); }
@@ -980,23 +1008,29 @@ const Eggs = (() => {
     text(g, 'echo', x + w / 2 - textWidth('echo') / 2, by, C.white, C.v1);
   };
   E.echo = async () => {
-    const c = await choose(NAR, 'A shimmering doorway. A small brass plate: “echo — a world that learns you.”', ['Step closer', 'What is echo?', 'Leave']);
+    const c = await choose(NAR, L('A shimmering doorway. A small brass plate: “echo — a world that learns you.”', 'Işıldayan bir kapı. Küçük, pirinç bir levha: “echo — seni öğrenen bir dünya.”'), L(['Step closer', 'What is echo?', 'Leave'], ['Yaklaş', 'echo nedir?', 'Boş ver']));
     if (c === 1) return UI.panel('echo');
     if (c === 2) return;
     const post = posterior(), top = post.indexOf(Math.max(...post)), [verb, pct] = predictNext(post);
     const bars = ARCH.map((a, i) => `<div class="bar${i === top ? ' top' : ''}"><span>${a}</span><i style="--w:${Math.max(2, Math.round(post[i] * 100))}%"></i><b>${Math.round(post[i] * 100)}%</b></div>`).join('');
-    const node = html(`<p class="lead">echo is an open world that reads human intention from play alone. Every move is recorded and folded into a Bayesian model — until the world has your echo.</p>
+    const node = html(L(`<p class="lead">echo is an open world that reads human intention from play alone. Every move is recorded and folded into a Bayesian model — until the world has your echo.</p>
       <p>This little world has been quietly doing a tiny version of that to you: <b>${ECHO.n}</b> observations since you arrived.</p>
       <div class="bars">${bars}</div>
       <p>Most likely, you are <b>the ${ARCH[top]}</b> — ${ARCH_NOTE[top]}. Your echo predicts your next move: <b>${verb}</b> (${pct}%).</p>
       <div class="cast"></div>
-      <p><a href="${ME.echo}" target="_blank" rel="noopener">echovirtualworld.com ↗</a> — “A living world. A place of your own.”</p>`);
+      <p><a href="${ME.echo}" target="_blank" rel="noopener">echovirtualworld.com ↗</a> — “A living world. A place of your own.”</p>`,
+      `<p class="lead">echo, insan niyetini yalnızca oyundan okuyan açık bir dünya. Her hamle kaydedilip bir Bayes modeline işleniyor; ta ki dünya senin yankını öğrenene kadar.</p>
+      <p>Bu küçük dünya da sessiz sedasız sana bunun minicik bir versiyonunu uyguluyordu: geldiğinden beri <b>${ECHO.n}</b> gözlem.</p>
+      <div class="bars">${bars}</div>
+      <p>Büyük ihtimalle sen <b>${ARCH[top]}</b> tipisin: ${ARCH_NOTE[top]}. Yankın bir sonraki hamleni tahmin ediyor: <b>${verb}</b> (%${pct}).</p>
+      <div class="cast"></div>
+      <p><a href="${ME.echo}" target="_blank" rel="noopener">echovirtualworld.com ↗</a> — “Yaşayan bir dünya. Sana ait bir yer.”</p>`));
     const cast = node.querySelector('.cast');
     for (const k of ['artun', 'teyze', 'simitci', 'prof', 'guestA', 'guestB', 'fisher', 'tea']) cast.appendChild(makePerson(LOOKS[k]).d[0]);
     const me = P().frames.d[0], you = document.createElement('div'); you.className = 'you'; const mc = canvas(16, 20); mc.g.drawImage(me, 0, 0); you.appendChild(mc); cast.appendChild(you);
-    await UI.custom({ kicker: 'Lab Garden · side project', title: 'echo', accent: 'violet', node });
+    await UI.custom({ kicker: L('Lab Garden · side project', 'Lab Bahçesi · yan proje'), title: 'echo', accent: 'violet', node });
     ghost.until = Game.t + 60;
-    UI.toast('Your <b>echo</b> is walking with you now — your own moves, a beat late.', 5000);
+    UI.toast(L('Your <b>echo</b> is walking with you now — your own moves, a beat late.', '<b>Yankın</b> artık seninle yürüyor: kendi hamlelerin, bir adım geriden.'), 5000);
     secret('echo');
   };
 
@@ -1007,10 +1041,10 @@ const Eggs = (() => {
     const spk = (look, name, color, voice) => ({ name, color, voice, portrait: portraitOf(makePerson(LOOKS[look])) });
     Object.assign(SP, {
       artun: spk('artun', 'ARTUN', 'var(--teal)', 0), teyze: spk('teyze', 'TEYZE', 'var(--violet)', 5), ece: spk('student1', 'ECE', 'var(--red)', 3), mert: spk('student2', 'MERT', 'var(--gold)', 1),
-      guard: spk('guard', 'GUARD', 'var(--navy)', -2), prof: spk('prof', 'PROFESSOR', 'var(--brown)', -1), watch: spk('watchmaker', 'WATCHMAKER', 'var(--teal)', -1),
+      guard: spk('guard', L('GUARD', 'BEKÇİ'), 'var(--navy)', -2), prof: spk('prof', L('PROFESSOR', 'PROFESÖR'), 'var(--brown)', -1), watch: spk('watchmaker', L('WATCHMAKER', 'SAATÇİ'), 'var(--teal)', -1),
       voli: { name: 'VOLI', color: 'var(--violet)', voice: 7, portrait: (() => { const c = canvas(16, 15); c.g.drawImage(PROPS.voli().img, -7, -14); return c; })() },
-      garson: spk('garson', 'GARSON', 'var(--red)', 1), simitci: spk('simitci', 'SİMİTÇİ', 'var(--red)', -1), conductor: spk('conductor', 'CONDUCTOR', 'var(--blue)', 0), conductorL: spk('conductor', 'CONDUCTOR', 'var(--blue)', 2),
-      fisher: spk('fisher', 'BALIKÇI', 'var(--gold)', -2), comic: spk('comic', 'THE COMIC', 'var(--violet)', 2), tea: spk('tea', 'TEA ROOM', 'var(--red)', 5), bookie: spk('bookie', 'BOOKIE', 'var(--green)', -1),
+      garson: spk('garson', 'GARSON', 'var(--red)', 1), simitci: spk('simitci', 'SİMİTÇİ', 'var(--red)', -1), conductor: spk('conductor', L('CONDUCTOR', 'KONDÜKTÖR'), 'var(--blue)', 0), conductorL: spk('conductor', L('CONDUCTOR', 'KONDÜKTÖR'), 'var(--blue)', 2),
+      fisher: spk('fisher', 'BALIKÇI', 'var(--gold)', -2), comic: spk('comic', L('THE COMIC', 'KOMEDYEN'), 'var(--violet)', 2), tea: spk('tea', L('TEA ROOM', 'ÇAY SALONU'), 'var(--red)', 5), bookie: spk('bookie', L('BOOKIE', 'BAHİSÇİ'), 'var(--green)', -1),
     });
     E.artunEnt = ents.find(e => e.look === LOOKS.artun);
     E.guardEnt = byLook('guard')[0];
@@ -1019,16 +1053,16 @@ const Eggs = (() => {
     Game.addInter({ ent: pasa, r: 16, label: 'pet', fn: async () => {
       SFX.bark(); for (let i = 0; i < 3; i++) setTimeout(() => Game.heart(pasa.x, pasa.y - 14), i * 180);
       if (pasa.state !== 'follow') {
-        await UI.say(NAR, ['Paşa — Artun’s dog — sniffs your hand, considers it very carefully, and approves.', 'He has appointed himself your escort. He will follow you everywhere. This is not negotiable.']);
+        await UI.say(NAR, L(['Paşa — Artun’s dog — sniffs your hand, considers it very carefully, and approves.', 'He has appointed himself your escort. He will follow you everywhere. This is not negotiable.'], ['Artun’un köpeği Paşa elini kokluyor, uzun uzun düşünüyor ve onaylıyor.', 'Kendini sana refakatçi atadı. Her yere peşinden gelecek. Bu konu pazarlığa kapalı.']));
         pasa.state = 'follow'; E.follower = pasa; secret('pasa');
       } else {
-        await UI.say(NAR, [pick(['Paşa rolls onto his back. Belly rubs are now mandatory.', 'Paşa offers you his paw, very formally. (“Paşa” was an Ottoman general’s title. He takes it seriously.)', 'Hav! (Turkish for “woof”.)', 'Paşa leans his whole weight against your leg. That’s a hug.'])]);
+        await UI.say(NAR, [pick(L(['Paşa rolls onto his back. Belly rubs are now mandatory.', 'Paşa offers you his paw, very formally. (“Paşa” was an Ottoman general’s title. He takes it seriously.)', 'Hav! (Turkish for “woof”.)', 'Paşa leans his whole weight against your leg. That’s a hug.'], ['Paşa sırtüstü yatıyor. Göbek kaşımak artık zorunlu.', 'Paşa çok resmî bir edayla patisini uzatıyor. (“Paşa” Osmanlı’da bir general unvanıydı. Kendisi bunu ciddiye alıyor.)', 'Hav! (İngilizcesi “woof”.)', 'Paşa bütün ağırlığını bacağına veriyor. Bu bir sarılma.']))]);
       }
     } });
     const tarcin = Game.entity(new Cat(C.y2, C.y1, 54.4 * 16, 21.6 * 16, { state: 'loaf', eye: C.g4 }));
-    Game.addInter({ ent: tarcin, r: 16, label: 'pet', fn: async () => { SFX.purr(); Game.heart(tarcin.x, tarcin.y - 10); await UI.say(NAR, ['Tarçın (“cinnamon”) is the real owner of this tea garden. The waiter just works here.']); } });
+    Game.addInter({ ent: tarcin, r: 16, label: 'pet', fn: async () => { SFX.purr(); Game.heart(tarcin.x, tarcin.y - 10); await UI.say(NAR, L(['Tarçın (“cinnamon”) is the real owner of this tea garden. The waiter just works here.'], ['Bu çay bahçesinin asıl sahibi Tarçın. Garson sadece burada çalışıyor.'])); } });
     const mouser = Game.entity(new Cat(C.ink2, C.ink, 21.4 * 16, 13.9 * 16, { state: 'loaf', eye: C.y3, collar: true }));
-    Game.addInter({ ent: mouser, r: 16, label: 'pet', fn: async () => { await UI.say(NAR, ['A cat in an official-looking collar. The tag reads: CHIEF MOUSER (ACTING).', 'He does not acknowledge you. In London, that is the highest honour.']); secret('mouser'); } });
+    Game.addInter({ ent: mouser, r: 16, label: 'pet', fn: async () => { await UI.say(NAR, L(['A cat in an official-looking collar. The tag reads: CHIEF MOUSER (ACTING).', 'He does not acknowledge you. In London, that is the highest honour.'], ['Resmî görünümlü tasmalı bir kedi. Künyede şöyle yazıyor: BAŞ FARE AVCISI (VEKİL).', 'Seni görmezden geliyor. Londra’da bundan büyük onur yoktur.'])); secret('mouser'); } });
     // ambient life
     Game.addObj({ x: 0, y: 0, sortY: 1e9, vw: 1e5, vh: 1e5, dx: 0, dy: 0, update: dt => flyers.update(dt), draw: (g, cx, cy) => flyers.draw(g, cx, cy) });
     const flyers = new Flyers();
@@ -1088,18 +1122,19 @@ const Eggs = (() => {
 
   /* ================= per-frame ================= */
   let partyFocus = -1, ringT = 0;
-  const MURMUR = ['BLAH BLAH', 'MM-HM', 'HAHA', '...SO THEN...', 'RIGHT?!', 'NO WAY', '~ ~ ~', 'ANYWAY...', 'P < 0.05', 'TOTALLY', 'WAIT WHAT', 'MHM MHM', '...GRANT...', 'CANAPÉ?'];
+  const MURMUR = L(['BLAH BLAH', 'MM-HM', 'HAHA', '...SO THEN...', 'RIGHT?!', 'NO WAY', '~ ~ ~', 'ANYWAY...', 'P < 0.05', 'TOTALLY', 'WAIT WHAT', 'MHM MHM', '...GRANT...', 'CANAPÉ?'],
+    ['BLA BLA', 'HI-HI', 'HAHA', '...SONRA DA...', 'DİMİ?!', 'YOK ARTIK', '~ ~ ~', 'NEYSE...', 'P < 0.05', 'AYNEN', 'NASIL YANİ', 'HI HI HI', '...HİBE...', 'KANAPE?']);
   const garble = () => pick(MURMUR);
   let garbles = [garble(), garble(), garble(), garble()], garbleT = 0;
   E.tick = (dt) => {
     const p = P();
     // the phone keeps ringing in London until answered
-    if (!E.phoneAnswered && p.x < 27 * 16 && Math.hypot(p.x - 20.4 * 16, p.y - 17.7 * 16) < 150 && Game.t - ringT > 4.5) { ringT = Game.t; SFX.ring(); const ph = Game.G.objects.find(o => o.id === 'phone'); if (ph) Game.particle({ x: ph.x + 8, y: ph.y - 40, vy: -8, life: 1, kind: 'text', text: 'RING', col: C.y3 }); }
+    if (!E.phoneAnswered && p.x < 27 * 16 && Math.hypot(p.x - 20.4 * 16, p.y - 17.7 * 16) < 150 && Game.t - ringT > 4.5) { ringT = Game.t; SFX.ring(); const ph = Game.G.objects.find(o => o.id === 'phone'); if (ph) Game.particle({ x: ph.x + 8, y: ph.y - 40, vy: -8, life: 1, kind: 'text', text: L('RING', 'ZIRR'), col: C.y3 }); }
     // the cocktail party
     partyFocus = -1;
     if (E.partyGuests) E.partyGuests.forEach((g, i) => { if (Math.hypot(g.x - p.x, g.y - p.y) < 22) partyFocus = i; });
     garbleT -= dt; if (garbleT < 0) { garbleT = 0.7; const k = (Math.random() * 4) | 0; garbles[k] = garble(); }
-    if (partyFocus >= 0 && !Game.flag('partySeen')) { Game.flag('partySeen', 1); UI.toast('Notice the other voices fade when you focus on one?', 4500); }
+    if (partyFocus >= 0 && !Game.flag('partySeen')) { Game.flag('partySeen', 1); UI.toast(L('Notice the other voices fade when you focus on one?', 'Birine odaklanınca öbür seslerin kısıldığını fark ettin mi?'), 4500); }
   };
   E.overlay = (g, cx, cy) => {
     if (!E.partyGuests) return;
@@ -1134,11 +1169,11 @@ const Eggs = (() => {
       E.party = !E.party;
       for (const e of Game.G.entities) e.hat = E.party ? partyHat : null;
       for (let i = 0; i < 60; i++) Game.particle({ x: P().x + (Math.random() - 0.5) * 200, y: P().y - 120 - Math.random() * 40, vx: (Math.random() - 0.5) * 30, vy: 20 + Math.random() * 30, g: 10, life: 4, col: pick([C.r3, C.y3, C.c3, C.p2, C.b3]), size: 2 });
-      SFX.secret(); UI.toast(E.party ? 'Party mode. Everyone gets a hat.' : 'Party’s over. Hats returned.');
+      SFX.secret(); UI.toast(E.party ? L('Party mode. Everyone gets a hat.', 'Parti modu. Herkese şapka.') : L('Party’s over. Hats returned.', 'Parti bitti. Şapkalar iade edildi.'));
       secret('konami');
     }
     const word = tail(4).join('').toLowerCase();
-    if (word === 'hire' && Game.G.mode === 'play' && !UI.busy) { UI.toggleCV(true); UI.toast('You typed “hire”. Excellent instincts.'); }
+    if (word === 'hire' && Game.G.mode === 'play' && !UI.busy) { UI.toggleCV(true); UI.toast(L('You typed “hire”. Excellent instincts.', '“hire” yazdın. İçgüdülerin harika.')); }
   };
   function partyHat(g, x, y, dir) {
     const c = [C.r3, C.y3, C.c3][(x * 7 + y) % 3 < 0 ? 0 : ((x * 7) % 3 + 3) % 3];
@@ -1147,7 +1182,7 @@ const Eggs = (() => {
   }
 
   E.allFound = async () => {
-    await UI.custom({ kicker: '✦ ' + total() + '/' + total(), title: 'You found everything.', accent: 'gold', body: `<p class="lead">Every secret. Every cat. Every bad joke. That’s thoroughness — the trait I value most in a collaborator.</p><p>So let’s actually talk. Tell me you finished the world and I’ll owe you a çay (or, fine, a tea with milk).</p>${linksHTML(true)}` });
+    await UI.custom({ kicker: '✦ ' + total() + '/' + total(), title: L('You found everything.', 'Her şeyi buldun.'), accent: 'gold', body: L(`<p class="lead">Every secret. Every cat. Every bad joke. That’s thoroughness — the trait I value most in a collaborator.</p><p>So let’s actually talk. Tell me you finished the world and I’ll owe you a çay (or, fine, a tea with milk).</p>`, `<p class="lead">Her sır. Her kedi. Her kötü espri. İşte titizlik bu: bir çalışma arkadaşında en çok değer verdiğim özellik.</p><p>O zaman gerçekten konuşalım. Dünyayı bitirdiğini söyle, sana bir çay borçlu olayım (ya da peki, sütlü bir çay).</p>`) + linksHTML(true) });
   };
 
   return E;

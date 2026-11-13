@@ -8,20 +8,20 @@ const MAP_W = 96, MAP_H = 60;
 
 // named places, used for zone toasts + the map screen
 const ZONES = [
-  { id: 'imperial', name: 'London · South Kensington', x0: 2, y0: 2, x1: 18, y1: 19, city: 'london' },
-  { id: 'westminster', name: 'London · Clock & Watch', x0: 18, y0: 2, x1: 27, y1: 19, city: 'london' },
-  { id: 'soho', name: 'London · Open Mic Street', x0: 2, y0: 19, x1: 27, y1: 39, city: 'london' },
-  { id: 'hippodrome', name: 'London · The Hippodrome', x0: 2, y0: 39, x1: 27, y1: 58, city: 'london' },
-  { id: 'channel', name: 'The Channel', x0: 27, y0: 0, x1: 38, y1: 60, city: 'sea' },
-  { id: 'bogazici', name: 'İstanbul · Boğaziçi Hill', x0: 38, y0: 2, x1: 57, y1: 13, city: 'istanbul' },
-  { id: 'cay', name: 'İstanbul · Tea Garden', x0: 38, y0: 13, x1: 57, y1: 31, city: 'istanbul' },
-  { id: 'station', name: 'İstanbul · Spike Train Station', x0: 38, y0: 31, x1: 57, y1: 42, city: 'istanbul' },
-  { id: 'harbour', name: 'İstanbul · Harbour', x0: 38, y0: 42, x1: 57, y1: 60, city: 'istanbul' },
-  { id: 'bosphorus', name: 'The Bosphorus', x0: 56, y0: 0, x1: 61, y1: 60, city: 'sea' },
-  { id: 'hill', name: 'Ankara · School Hill', x0: 61, y0: 2, x1: 95, y1: 15, city: 'ankara' },
-  { id: 'home', name: 'Ankara · Home', x0: 61, y0: 15, x1: 82, y1: 33, city: 'ankara' },
-  { id: 'work', name: 'Ankara · Work Street', x0: 82, y0: 15, x1: 95, y1: 42, city: 'ankara' },
-  { id: 'lab', name: 'Ankara · The Lab Garden', x0: 61, y0: 33, x1: 86, y1: 58, city: 'ankara' },
+  { id: 'imperial', name: L('London · South Kensington', 'Londra · South Kensington'), x0: 2, y0: 2, x1: 18, y1: 19, city: 'london' },
+  { id: 'westminster', name: L('London · Clock & Watch', 'Londra · Saat Kulesi'), x0: 18, y0: 2, x1: 27, y1: 19, city: 'london' },
+  { id: 'soho', name: L('London · Open Mic Street', 'Londra · Açık Mikrofon Sokağı'), x0: 2, y0: 19, x1: 27, y1: 39, city: 'london' },
+  { id: 'hippodrome', name: L('London · The Hippodrome', 'Londra · Hipodrom'), x0: 2, y0: 39, x1: 27, y1: 58, city: 'london' },
+  { id: 'channel', name: L('The Channel', 'Manş Denizi'), x0: 27, y0: 0, x1: 38, y1: 60, city: 'sea' },
+  { id: 'bogazici', name: L('İstanbul · Boğaziçi Hill', 'İstanbul · Boğaziçi Tepesi'), x0: 38, y0: 2, x1: 57, y1: 13, city: 'istanbul' },
+  { id: 'cay', name: L('İstanbul · Tea Garden', 'İstanbul · Çay Bahçesi'), x0: 38, y0: 13, x1: 57, y1: 31, city: 'istanbul' },
+  { id: 'station', name: L('İstanbul · Spike Train Station', 'İstanbul · Spike Treni Garı'), x0: 38, y0: 31, x1: 57, y1: 42, city: 'istanbul' },
+  { id: 'harbour', name: L('İstanbul · Harbour', 'İstanbul · Liman'), x0: 38, y0: 42, x1: 57, y1: 60, city: 'istanbul' },
+  { id: 'bosphorus', name: L('The Bosphorus', 'Boğaz'), x0: 56, y0: 0, x1: 61, y1: 60, city: 'sea' },
+  { id: 'hill', name: L('Ankara · School Hill', 'Ankara · Okul Tepesi'), x0: 61, y0: 2, x1: 95, y1: 15, city: 'ankara' },
+  { id: 'home', name: L('Ankara · Home', 'Ankara · Ev'), x0: 61, y0: 15, x1: 82, y1: 33, city: 'ankara' },
+  { id: 'work', name: L('Ankara · Work Street', 'Ankara · İş Sokağı'), x0: 82, y0: 15, x1: 95, y1: 42, city: 'ankara' },
+  { id: 'lab', name: L('Ankara · The Lab Garden', 'Ankara · Lab Bahçesi'), x0: 61, y0: 33, x1: 86, y1: 58, city: 'ankara' },
 ];
 function zoneAt(tx, ty) {
   for (const z of ZONES) if (tx >= z.x0 && tx < z.x1 && ty >= z.y0 && ty < z.y1) return z;
@@ -170,11 +170,21 @@ function buildTerrain() {
    ===================================================================== */
 // the ASELSAN gate: a two-tile gap in the fence line (px), closed by a boom until the guard lets you in
 const ASELSAN_GATE = { x: 89 * 16, y: Math.round(31.9 * 16), w: 32 };
+// the interaction prompt in Turkish (labels are given in English where things are placed)
+const LABEL_TR = {
+  talk: 'konuş', read: 'oku', enter: 'gir', look: 'bak', pet: 'sev', sit: 'otur', row: 'kürek çek', play: 'oyna', open: 'aç',
+  listen: 'dinle', board: 'bin', bet: 'bahse gir', ask: 'sor', wish: 'dilek tut', use: 'kullan', touch: 'dokun', think: 'düşün',
+  test: 'test et', 'step closer': 'yaklaş', spin: 'çevir', solve: 'çöz', simit: 'simit al', shake: 'salla', scroll: 'kaydır',
+  scan: 'tara', 'say hi': 'selam ver', pull: 'çek', post: 'postala', polish: 'parlat', order: 'sipariş ver', mic: 'sahneye çık',
+  mail: 'postaya bak', knock: 'kapıyı çal', heckle: 'laf at', flash: 'yükle', fish: 'balık tut', browse: 'göz at',
+  borrow: 'ödünç al', answer: 'telefonu aç',
+};
+const labelText = s => (LANG === 'tr' && LABEL_TR[s]) || s;
 const TRAVEL = [
-  { name: 'Home', x: 73.5, y: 25.6 }, { name: 'School Hill', x: 70, y: 11.6 }, { name: 'Lab Garden', x: 73.5, y: 36.6 },
-  { name: 'Work Street', x: 86.5, y: 27.2 }, { name: 'Boğaziçi', x: 48.5, y: 10.4 }, { name: 'Tea Garden', x: 49, y: 22 },
-  { name: 'İstanbul Station', x: 50.5, y: 35.8 }, { name: 'Harbour', x: 39, y: 45.8 }, { name: 'London Station', x: 18.5, y: 35.8 },
-  { name: 'Imperial', x: 9.4, y: 13.6 }, { name: 'Clock Tower', x: 20.4, y: 13.6 }, { name: 'Open Mic St.', x: 12.5, y: 27.2 }, { name: 'Hippodrome', x: 19, y: 41.6 },
+  { name: L('Home', 'Ev'), x: 73.5, y: 25.6 }, { name: L('School Hill', 'Okul Tepesi'), x: 70, y: 11.6 }, { name: L('Lab Garden', 'Lab Bahçesi'), x: 73.5, y: 36.6 },
+  { name: L('Work Street', 'İş Sokağı'), x: 86.5, y: 27.2 }, { name: 'Boğaziçi', x: 48.5, y: 10.4 }, { name: L('Tea Garden', 'Çay Bahçesi'), x: 49, y: 22 },
+  { name: L('İstanbul Station', 'İstanbul Garı'), x: 50.5, y: 35.8 }, { name: L('Harbour', 'Liman'), x: 39, y: 45.8 }, { name: L('London Station', 'Londra Garı'), x: 18.5, y: 35.8 },
+  { name: 'Imperial', x: 9.4, y: 13.6 }, { name: L('Clock Tower', 'Saat Kulesi'), x: 20.4, y: 13.6 }, { name: L('Open Mic St.', 'Açık Mikrofon'), x: 12.5, y: 27.2 }, { name: L('Hippodrome', 'Hipodrom'), x: 19, y: 41.6 },
 ];
 
 function populateWorld(W) {
@@ -187,7 +197,7 @@ function populateWorld(W) {
   W.building('bilkent', 75, 10, { act: E.bilkent, label: 'enter', id: 'bilkent' });
   W.building('physics', 87, 10, { act: E.physics, label: 'enter', id: 'physics' });
   W.prop('apple', 86, 9.9, { act: E.apple, label: 'shake', ix: 86 * 16, iy: 9.9 * 16 + 8, id: 'apple' });
-  W.prop('chalkboard', 66.5, 12.9, { act: E.msf, label: 'solve', opts: { lines: ['MSF 2021', 'BALL = ?'] } });
+  W.prop('chalkboard', 66.5, 12.9, { act: E.msf, label: 'solve', opts: { lines: ['MSF 2021', L('BALL = ?', 'TOP = ?')] } });
   W.prop('bigCheck', 73.6, 12.9, { act: E.check, label: 'read' });
   W.prop('trophy', 77.4, 12.9, { act: E.trophy, label: 'polish' });
   const sc = W.prop('scrollio', 80.2, 12.9, { act: E.scrollio, label: 'scroll', id: 'scrollio' });
@@ -208,8 +218,8 @@ function populateWorld(W) {
   W.prop('fountain', 73.5, 28.7, { act: E.fountain, label: 'wish', ix: 73.5 * 16, iy: 28.9 * 16 + 4, ir: 22 });
   W.prop('bench', 69, 27.6, { label: 'sit' });
   W.prop('bench', 78.2, 27.6, { act: E.bench, label: 'sit', id: 'bench' });
-  W.prop('bigsign', 70.2, 31.7, { opts: { lines: ['HOŞ GELDİN', 'WELCOME TO BALTAKÖY', 'POP. 1 (+YOU)'] }, act: E.welcome, label: 'read' });
-  W.prop('signpost', 77, 31.5, { opts: { lines: [['SCHOOL HILL', 'u'], ['ISTANBUL', 'l'], ['WORK ST.', 'r'], ['LAB GARDEN', 'd']] }, act: E.signpost, label: 'read' });
+  W.prop('bigsign', 70.2, 31.7, { opts: { lines: L(['HOŞ GELDİN', 'WELCOME TO BALTAKÖY', 'POP. 1 (+YOU)'], ['WELCOME', "BALTAKÖY'E HOŞ GELDİN", 'NÜFUS 1 (+SEN)']) }, act: E.welcome, label: 'read' });
+  W.prop('signpost', 77, 31.5, { opts: { lines: [[L('SCHOOL HILL', 'OKUL TEPESİ'), 'u'], [L('ISTANBUL', 'İSTANBUL'), 'l'], [L('WORK ST.', 'İŞ SOKAĞI'), 'r'], [L('LAB GARDEN', 'LAB BAHÇESİ'), 'd']] }, act: E.signpost, label: 'read' });
   lamp(66.4, 24.6); lamp(80.6, 24.6); lamp(66.4, 30.9); lamp(80.6, 30.9);
   W.npc('artun', 76.2, 26.3, { act: E.artun, label: 'talk', dir: 'l', id: 'artun' });
   W.npc('teyze', 69, 29, { act: E.teyze, label: 'talk', id: 'teyze' });
@@ -232,12 +242,12 @@ function populateWorld(W) {
   const gate = ASELSAN_GATE;
   W.addObj({ x: gate.x, y: gate.y, sortY: gate.y, vw: gate.w + 10, vh: 50, dx: 0, dy: -46, draw: E.drawBoom });
   W.stamp(gate.x, gate.y - 3, gate.w, 4);
-  W.prop('signpost', 87.6, 30.6, { opts: { lines: ['RESTRICTED'] }, act: E.guard, label: 'read' });
+  W.prop('signpost', 87.6, 30.6, { opts: { lines: [L('RESTRICTED', 'YASAK BÖLGE')] }, act: E.guard, label: 'read' });
   for (const [x, y, k] of [[93.2, 18.6, 'pine'], [92.9, 23, 'green'], [84.5, 31.5, 'green'], [94.2, 29.5, 'pine']]) tree(x, y, k);
   lamp(85.4, 27.9); lamp(92.4, 27.9);
 
   /* ---------------- ANKARA · Lab Garden ---------------- */
-  W.prop('bigsign', 70.6, 34.6, { opts: { lines: ['THE LAB GARDEN', 'PLEASE TOUCH'] }, act: E.labSign, label: 'read' });
+  W.prop('bigsign', 70.6, 34.6, { opts: { lines: L(['THE LAB GARDEN', 'PLEASE TOUCH'], ['LAB BAHÇESİ', 'LÜTFEN DOKUNUN']) }, act: E.labSign, label: 'read' });
   // echo: a doorway at the end of the garden's spine
   const echo = W.prop('echo', 73.5, 55.5, { act: E.echo, label: 'step closer', id: 'echo', iy: 55.5 * 16 + 6 });
   echo.post = (g, x, y, t) => E.drawPortal(g, x + 12, y + 13, 16, 28, t);
@@ -259,7 +269,7 @@ function populateWorld(W) {
   tc.post = (g, x, y, t) => E.drawSparks(g, x + 12, y + 8, t);
   tc.extraTop = 24;
   for (const x of [86.6, 87.6, 89.6, 90.6]) W.prop('fence', x, 48.4, { opts: { white: true } });
-  W.prop('signpost', 86.4, 44.6, { opts: { lines: ['DANGER', 'HIGH VOLTAGE'] }, act: E.probe, label: 'read' });
+  W.prop('signpost', 86.4, 44.6, { opts: { lines: L(['DANGER', 'HIGH VOLTAGE'], ['TEHLİKE', 'YÜKSEK GERİLİM']) }, act: E.probe, label: 'read' });
   for (const [x, y, k, s] of [[62.4, 38, 'green', 1], [62.6, 45, 'pine', 1], [62.3, 51.4, 'green', 1], [70.8, 54.6, 'cherry', 1], [76.4, 54.8, 'green', 1], [91.8, 46.6, 'green', 1], [93.2, 51.2, 'pine', 1], [81.6, 55, 'green', 1.1], [66.6, 55.2, 'autumn', 1]]) tree(x, y, k, s);
   for (const [x, y] of [[71.4, 38.8], [75.6, 38.8], [71.4, 49], [75.6, 47.6]]) W.prop('pot', x, y, { opts: { flower: pick([C.p2, C.y3, C.r3, C.b3], hash2(x, y)) } });
   lamp(71.6, 36.0); lamp(75.4, 36.0); lamp(71.6, 50.8); lamp(75.4, 50.8);
@@ -286,7 +296,7 @@ function populateWorld(W) {
   const st = W.building('station', 40, 35, { arg: 'İSTANBUL', act: E.stationInfo, label: 'read', id: 'istStation' });
   st.post = (g, x, y) => E.drawClock(g, x + st.b.c.clock.x, y + st.b.c.clock.y, st.b.c.clock.r, 'Europe/Istanbul');
   W.npc('conductor', 52.2, 35.6, { act: E.conductor, label: 'board', id: 'conductorI' });
-  W.prop('platformSign', 54, 35.5, { opts: { text: 'SPIKE TRAIN · 1' } });
+  W.prop('platformSign', 54, 35.5, { opts: { text: L('SPIKE TRAIN · 1', 'SPIKE TRENİ · 1') } });
   W.prop('buffer', 55.6, 37.9, { noSolid: true });
   W.prop('bench', 53.4, 34.7);
   // the harbour

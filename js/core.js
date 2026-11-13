@@ -7,6 +7,11 @@
 
 const TILE = 16;
 
+/* ---------- language: English, unless the flag switch has put ?lang=tr in the address ---------- */
+const LANG = (() => { try { return new URLSearchParams(location.search).get('lang') === 'tr' ? 'tr' : 'en'; } catch (e) { return 'en'; } })();
+// L('English', 'Türkçe') — any type: strings, arrays of lines, objects
+const L = (en, tr) => (LANG === 'tr' && tr != null ? tr : en);
+
 /* ---------- random & noise ---------- */
 function mulberry32(a) {
   return function () {

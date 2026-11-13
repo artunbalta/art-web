@@ -166,13 +166,13 @@ const UI = (() => {
     c.innerHTML = `
       <header class="top"><h1>${ME.name}</h1><p>${ME.title}</p>
         <p class="contact"><a href="mailto:${ME.email}">${ME.email}</a> · <a href="${ME.github}" target="_blank" rel="noopener">github.com/artunbalta</a> · <a href="${ME.linkedin}" target="_blank" rel="noopener">linkedin.com/in/artunbalta</a></p>
-        <p class="dl"><a class="btn" href="${ME.cv}" target="_blank" rel="noopener">Download the PDF ↓</a> <button class="btn ghost" data-back>← back to the world</button></p></header>
-      ${sec('Profile', `<p>${CV.profile}</p>`)}
-      ${sec('Education', CV.education.map(row).join(''))}
-      ${sec('Research & Projects', CV.projects.map(p => `<article><header><h3>${p.name}${p.link ? ` · <a href="${p.link}" target="_blank" rel="noopener">${p.link.replace('https://', '')}</a>` : ''}</h3></header><ul>${p.points.map(x => `<li>${x}</li>`).join('')}</ul></article>`).join(''))}
-      ${sec('Experience', CV.experience.map(row).join(''))}
-      ${sec('Skills, Languages & Interests', `<dl>${CV.skills.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`)}
-      <p class="foot">You skipped ${Object.keys(SECRETS).length} secrets to get here. Respect. They’ll wait.</p>`;
+        <p class="dl"><a class="btn" href="${ME.cv}" target="_blank" rel="noopener">${L('Download the PDF ↓', 'PDF’i indir (İngilizce) ↓')}</a> <button class="btn ghost" data-back>${L('← back to the world', '← dünyaya dön')}</button></p></header>
+      ${sec(L('Profile', 'Profil'), `<p>${CV.profile}</p>`)}
+      ${sec(L('Education', 'Eğitim'), CV.education.map(row).join(''))}
+      ${sec(L('Research & Projects', 'Araştırma ve Projeler'), CV.projects.map(p => `<article><header><h3>${p.name}${p.link ? ` · <a href="${p.link}" target="_blank" rel="noopener">${p.link.replace('https://', '')}</a>` : ''}</h3></header><ul>${p.points.map(x => `<li>${x}</li>`).join('')}</ul></article>`).join(''))}
+      ${sec(L('Experience', 'Deneyim'), CV.experience.map(row).join(''))}
+      ${sec(L('Skills, Languages & Interests', 'Beceriler, Diller ve İlgi Alanları'), `<dl>${CV.skills.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`)}
+      <p class="foot">${L(`You skipped ${Object.keys(SECRETS).length} secrets to get here. Respect. They’ll wait.`, `Buraya gelmek için ${Object.keys(SECRETS).length} sırrı es geçtin. Saygı duyuyoruz. Onlar seni bekler.`)}</p>`;
     c.querySelector('[data-back]').addEventListener('click', () => toggleCV(false));
   }
   function toggleCV(force) {
